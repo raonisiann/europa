@@ -1,0 +1,9 @@
+EXEC_FILE_NAME=$(BIN_DIR)\europa.exe
+C_FILES=$(SRC_DIR)\main.c $(SRC_DIR)\lexer.c $(SRC_DIR)\parser.c $(SRC_DIR)\ast.c $(SRC_DIR)\core/*.c
+INCLUDE_DIR=/I$(SRC_DIR)\include /I$(SRC_DIR)\core\include
+
+all: 
+    echo $(MAKEDIR)
+    echo $(BIN_DIR)
+    $(CC) /nologo /TC $(C_FILES) $(INCLUDE_DIR) /link /out:$(EXEC_FILE_NAME)
+
