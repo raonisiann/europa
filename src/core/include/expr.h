@@ -25,12 +25,12 @@ int do_string_compare(char *str1, char *str2);
 int do_number_compare(int n1, int n2);
 char *do_string_concat(struct e_value *str1, struct e_value *str2);
 char *convert_to_string_value(struct e_value *v);
-bool is_string_equal(char *str1, char *str2);
-bool is_number_equal(int n1, int n2);
-bool is_bool_equal(int b1, int b2);
-bool is_string_not_equal(char *str1, char *str2);
-bool is_number_not_equal(int n1, int n2);
-bool is_bool_not_equal(int b1, int b2);
+e_bool is_string_equal(char *str1, char *str2);
+e_bool is_number_equal(int n1, int n2);
+e_bool is_bool_equal(int b1, int b2);
+e_bool is_string_not_equal(char *str1, char *str2);
+e_bool is_number_not_equal(int n1, int n2);
+e_bool is_bool_not_equal(int b1, int b2);
 
 
 void value_eval(struct e_value *data);

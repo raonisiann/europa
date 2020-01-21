@@ -5,6 +5,8 @@
 #include <stdarg.h>
 #include "lexer.h"
 #include "memm.h"
+#include "europa_std.h"
+#include "europa_debug.h"
 
 struct lex_token *lex_tk;
 
@@ -30,11 +32,13 @@ struct reserved_word lex_reserved_words[10][7] = {
     // Size 4 comamnds
     {
         {"else", elsecmd},
+        {"true", boolean},
         {NULL, undefined}
     },
     // Size 5 comamnds
     {
         {"while", whilecmd},
+        {"false", boolean},
         {NULL, undefined}
     },
     // Size 6 commands 
@@ -63,7 +67,7 @@ int lex_match(const char expected){
         printf("Unexpected character '%c' at position %i line %i\n", lex_cur_ch, lex_cur_ch_pos, lex_cur_line);
         lex_terminator();
     }
-    lex_verbose("Matched  -> %c\n", expected);    
+    DEBUG_OUTPUT("Matched  -> %c\n", expected);    
     return 1;	
 }
 
@@ -74,7 +78,7 @@ int lex_match_optional(const char match){
 
 
 void lex_next_token(){
-    lex_verbose("NEXT TOKEN");
+    DEBUG_OUTPUT("NEXT TOKEN");
     // grab the next available char   
     lex_next_char();
     // this will end up with a non-space char, 
@@ -116,9 +120,24 @@ void lex_next_token(){
             case '/':
                 lex_tk = lex_create_tk(division, 1, "/");       
                 break;
-            case '=':
-                lex_tk = lex_create_tk(assign, 1, "=");       
+            case '=':                   
+                lex_next_char();
+                if(lex_cur_ch == '='){
+                    lex_tk = lex_create_tk(equal, 2, "==");
+                }else{
+                    lex_tk = lex_create_tk(assign, 1, "="); 
+                    lex_unget_char();
+                }                   
                 break;
+            case '!':                   
+                lex_next_char();
+                if(lex_cur_ch == '='){
+                    lex_tk = lex_create_tk(notequal, 2, "!=");
+                }else{
+                    lex_tk = lex_create_tk(negation, 1, "!"); 
+                    lex_unget_char();
+                }                   
+                break;                
             case '{':
                 lex_tk = lex_create_tk(ocurlybrc, 1, "{");
                 break;
@@ -133,7 +152,25 @@ void lex_next_token(){
                 break;                
             case ',':
                 lex_tk = lex_create_tk(comma, 1, ",");
-                break;                  
+                break;  
+            case '<':                
+                lex_next_char();
+                if(lex_cur_ch == '='){
+                    lex_tk = lex_create_tk(lte, 2, "<=");
+                }else{
+                    lex_tk = lex_create_tk(lt, 1, "<");
+                    lex_unget_char();
+                }
+                break;                                  
+            case '>':                
+                lex_next_char();
+                if(lex_cur_ch == '='){
+                    lex_tk = lex_create_tk(gte, 2, ">=");
+                }else{
+                    lex_tk = lex_create_tk(gt, 1, ">");
+                    lex_unget_char();
+                }                
+                break;                                             
             default: 
                 printf("Unable to handle character '%c' at position %i line %i\n", lex_cur_ch, lex_cur_ch_pos, lex_cur_line);
                 lex_terminator();
@@ -253,7 +290,7 @@ struct lex_token *lex_cap_reference(){
                 }
             }
             if(match){
-                lex_verbose("Captured -> Reserved word (%i) %s", buf_size, lex_reserved_words[buf_size][k].word);
+                DEBUG_OUTPUT("Captured -> Reserved word (%i) %s", buf_size, lex_reserved_words[buf_size][k].word);
                 return lex_create_tk(lex_reserved_words[buf_size][k].token, buf_size, buf);   
             }
             k++;
@@ -268,7 +305,8 @@ struct lex_token *lex_create_tk(int class, unsigned int size, char *value){
     tk->class = class;
     if(size > 0){
         tk->size = size;
-        tk->raw_value = strndup(value, size);
+        //tk->raw_value = strndup(value, size);
+        tk->raw_value = _STRING_DUP(value);
     }else{
         tk->size = size;
         tk->raw_value = NULL;        
@@ -314,16 +352,6 @@ void lex_terminator(){
     printf("Program is exiting due to an unrecoverable error.\n");
     exit(-1);
 }
-
-void lex_verbose(char *s, ...){
-    va_list ap;
-	va_start(ap, s);	
-    printf("VERBOSE [LEX]    :: ");
-	vfprintf(stdout, s, ap);
-    printf("\n");	
-    va_end(ap);      
-}
-
 
 void lex_clear_capture_buffer(char *buffer, unsigned int size){
     for(int i = 0; i < size; i++){

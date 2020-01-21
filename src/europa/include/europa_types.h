@@ -7,9 +7,9 @@
 #include "ast.h"
 
 typedef enum {
-    false = 0,
-    true = 1
-} bool;
+    e_false = '0',
+    e_true = '1'
+} e_bool;
 
 // User defined function at rutime
 // This same struct is used to store a function call (user or built-in)
@@ -31,7 +31,7 @@ struct e_value {
     union {
         char *str;            
         int num;    
-        bool boolean;                 
+        char boolean;                 
     };
 };
 
@@ -40,14 +40,6 @@ struct e_reference {
     char *name;     
     struct e_value *value; 
     unsigned int ht_hash;
-};
-
-
-struct e_flow {
-    char type;
-    struct ast_node *condition;
-    //struct dl_list *iftrue;    
-    //struct dl_list *iffalse;    
 };
 
 

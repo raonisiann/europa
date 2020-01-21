@@ -2,6 +2,8 @@
 #include "expr.h"
 #include "hashtable.h"
 #include "memm.h"
+#include "europa_error.h"
+#include "europa_debug.h"
 
 extern hashtable* symbols;
 
@@ -13,17 +15,17 @@ struct e_value *reference_eval(struct ast_node *n){
 	struct ht_entry *result = NULL;
 	result = ht_get(symbols, n->token->raw_value);
 	if(result){
-		printf("REFERENCE_FOUND  :: \n");
+		DEBUG_OUTPUT("REFERENCE_FOUND");
 		return result->data->value;
 	}else{
-		printf("REFERENCE_NOT_FOUND\n");
+		EUROPA_ERROR("Reference '%s' not found", n->token->raw_value);
 		return NULL;
 	}
 }
 
 void assignment_eval(struct ast_assignment_node *node){
 	// 
-	printf("NEW_REFERENCE    :: %s\n", node->reference->token->raw_value);
+	DEBUG_OUTPUT("NEW_REFERENCE '%s'", node->reference->token->raw_value);
 	struct e_value *expr_value = expr_eval(node->assigment);	
 	create_reference(node->reference->token->raw_value, expr_value);
 }

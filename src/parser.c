@@ -5,14 +5,16 @@
 #include "lexer.h"
 #include "ast.h"
 #include "statement.h"
-
+#include "flow.h"
+#include "list.h"
+#include "europa_debug.h"
 
 extern struct lex_token *lex_tk;
 
 // 
 int parser_accept(int token){
     if(TOKEN == token){          
-        parser_verbose("MATCHED TOKEN '%s'", lex_tk->raw_value);        
+        DEBUG_OUTPUT("MATCHED TOKEN '%s'", lex_tk->raw_value);        
         return 1;
     }
     return 0;
@@ -24,16 +26,6 @@ int parser_expect(int token){
         return 1;
     }
     parser_error_expected("Unexpected token '%s', should be -->>%i<<--\n", lex_tk->raw_value, token);
-}
-
-
-void parser_verbose(char *s, ...){
-    va_list ap;
-	va_start(ap, s);	
-    printf("VERBOSE [PARSER] :: ");
-	vfprintf(stdout, s, ap);
-    printf("\n");	
-    va_end(ap);    
 }
 
 // 
@@ -51,10 +43,10 @@ void parser_error_expected(char *s, ...){
 void lang(){        
     while(1){        
         if(parser_accept(newline)){
-            parser_verbose("Captured -> new line");    
+            DEBUG_OUTPUT("Captured -> new line");    
             lex_next_token();                                         
         }else if(TOKEN == eof){
-            parser_verbose("Captured -> End of file");        
+            DEBUG_OUTPUT("Captured -> End of file");        
         }else{
             struct e_stmt *_stmt = NULL;
             _stmt = stmt();
@@ -72,33 +64,39 @@ void lang(){
 struct e_stmt *stmt(){    
     // NEW_LINE
     if(parser_accept(newline)){
-        parser_verbose("new line for a statement");
+        DEBUG_OUTPUT("new line for a statement");
         lex_next_token(); 
         return NULL;
     }
     // IF EXPR { BLOCK }
-    else if (parser_accept(ifcmd)){            
-        parser_verbose("IF");
+    else if (parser_accept(ifcmd)){   
+        struct ast_node* condition = NULL;         
+        struct list *if_block = NULL;
+        DEBUG_OUTPUT("IF");
         lex_next_token(); 
-        expr();
-        parser_verbose("EXPR");
-        stmt_block();
-        parser_verbose("END_IF");
+        condition = expr();
+        DEBUG_OUTPUT("EXPR");
+        if_block = stmt_block();
+        DEBUG_OUTPUT("END_IF");
+        return stmt_create_flow(ifcmd, flow_create(condition, if_block, NULL));
     // WHILE EXPR { BLOCK }
-    }else if (parser_accept(whilecmd)){            
-        parser_verbose("WHILE");
+    }else if (parser_accept(whilecmd)){    
+        struct ast_node* condition = NULL;         
+        struct list *while_block = NULL;                
+        DEBUG_OUTPUT("WHILE");
         lex_next_token(); 
-        expr();
-        parser_verbose("EXPR");
-        stmt_block();
-        parser_verbose("END_WHILE");        
+        condition = expr();
+        DEBUG_OUTPUT("EXPR");
+        while_block = stmt_block();
+        DEBUG_OUTPUT("END_WHILE"); 
+        return stmt_create_flow(whilecmd, flow_create(condition, while_block, NULL));      
     }else{
     // EXPR, ASSINGMENT 
         struct ast_node* _expr = NULL;
         _expr = expr();         
         if(parser_accept(assign)){           
             struct ast_node* assign = NULL;
-            parser_verbose("ASSIGNMENT");             
+            DEBUG_OUTPUT("ASSIGNMENT");             
             lex_next_token(); 
             assign = expr();
             return stmt_create_assign(ast_create_assignment(_expr, assign));
@@ -108,22 +106,29 @@ struct e_stmt *stmt(){
     }      
 }
 
-void stmt_block(){
-    parser_verbose("IF_BLOCK");
+struct list *stmt_block(){
+    DEBUG_OUTPUT("IF_BLOCK");
     while(TOKEN == newline){
-        parser_verbose("Ignoring empty new lines");
+        DEBUG_OUTPUT("Ignoring empty new lines");
         parser_expect(newline);
-        lex_next_token();
+        lex_next_token();        
     }
     if(parser_accept(ocurlybrc)){
+        struct list *stmt_list = list_create();
+        struct e_stmt *stmt_item = NULL;
         lex_next_token();           
         while(TOKEN != ccurlybrc){
-            stmt();                        
+            stmt_item = stmt();   
+            if(stmt_item){
+                list_add_item(stmt_list, (void *)stmt_item);
+            }                     
         }
         parser_expect(ccurlybrc);
         lex_next_token();
+        return stmt_list;
     }else{
-        parser_verbose("Something else");
+        DEBUG_OUTPUT("Something else");
+        return NULL;
     }    
 }
 
@@ -132,17 +137,22 @@ struct ast_node* expr(){
     struct ast_node* right = NULL;
     struct ast_node* parent = NULL;
     left = term();     
-    if(TOKEN == plus || TOKEN == minus){                
+    if(TOKEN == plus || TOKEN == minus || TOKEN == andoper || TOKEN == oroper){                
         switch(TOKEN){
             case plus:             
-                parser_expect(plus);                                               
-                parent = ast_add_node(lex_tk, left, NULL);                                   
+                parser_expect(plus);                                                                                                  
                 break;
             case minus:                            
-                parser_expect(minus);               
-                parent = ast_add_node(lex_tk, left, NULL);                                   
+                parser_expect(minus);                                                                  
                 break;
+            case andoper:                            
+                parser_expect(andoper);                                                                  
+                break;
+            case oroper:                            
+                parser_expect(oroper);                                                                  
+                break;                                
         } 
+        parent = ast_add_node(lex_tk, left, NULL);
         lex_next_token();
         right = expr();            
         parent->right = right;
@@ -157,17 +167,34 @@ struct ast_node* term(){
     struct ast_node* right = NULL;   
     struct ast_node* parent = NULL;  
     left = factor();
-    if(TOKEN == multiply || TOKEN == division){        
+    if(TOKEN == multiply || TOKEN == division || TOKEN == equal || TOKEN == notequal || TOKEN == gt || TOKEN == gte || TOKEN == lt || TOKEN == lte){        
         switch(TOKEN){
             case multiply:
-                parser_expect(multiply);
-                parent = ast_add_node(lex_tk, left, NULL);   
+                parser_expect(multiply);                
                 break;
             case division:
-                parser_expect(division);
-                parent = ast_add_node(lex_tk, left, NULL); 
+                parser_expect(division);                
                 break;
+            case equal:
+                parser_expect(equal);                
+                break;                
+            case notequal:
+                parser_expect(notequal);                
+                break;                  
+            case gt: 
+                parser_expect(gt);                
+                break;                                  
+            case gte: 
+                parser_expect(gte);                
+                break;                          
+            case lt: 
+                parser_expect(lt);                
+                break;                                  
+            case lte: 
+                parser_expect(lte);                
+                break;                                          
         }
+        parent = ast_add_node(lex_tk, left, NULL); 
         lex_next_token();
         right = term();   
         parent->right = right;  
@@ -180,35 +207,39 @@ struct ast_node* term(){
 struct ast_node* factor(){   
     struct ast_node* leaf = NULL;   
     if(parser_accept(integer)){
-        parser_verbose("Captured -> digit (%i) %s", lex_tk->size, lex_tk->raw_value);         
+        DEBUG_OUTPUT("Captured -> digit (%i) %s", lex_tk->size, lex_tk->raw_value);         
         leaf = ast_add_node(lex_tk, NULL, NULL);
         lex_next_token();        
     }else if(parser_accept(string)){
-        parser_verbose("Captured -> STRING (%i) %s", lex_tk->size, lex_tk->raw_value);     
+        DEBUG_OUTPUT("Captured -> STRING (%i) %s", lex_tk->size, lex_tk->raw_value);     
         leaf = ast_add_node(lex_tk, NULL, NULL);    
         lex_next_token();
+    }else if(parser_accept(boolean)){
+        DEBUG_OUTPUT("Captured -> BOOLEAN (%i) %s", lex_tk->size, lex_tk->raw_value);     
+        leaf = ast_add_node(lex_tk, NULL, NULL);    
+        lex_next_token();        
     }else if(parser_accept(reference)){
-        parser_verbose("Captured -> reference (%i) %s", lex_tk->size, lex_tk->raw_value);
+        DEBUG_OUTPUT("Captured -> reference (%i) %s", lex_tk->size, lex_tk->raw_value);
         leaf = ast_add_node(lex_tk, NULL, NULL);  
         lex_next_token();
         if(parser_accept(oparenteses)){            
-            parser_verbose("FUNCTION CALL STARTED");
+            DEBUG_OUTPUT("FUNCTION CALL STARTED");
             lex_next_token();
             expr_list();
             parser_expect(cparenteses);
-            parser_verbose("FUNCTION CALL ENDED");
+            DEBUG_OUTPUT("FUNCTION CALL ENDED");
             lex_next_token();            
             leaf = ast_add_node(lex_tk, NULL, NULL);        
         }
     }else if(parser_accept(oparenteses)){
-            parser_verbose("OPEN_PARENTESES");
+            DEBUG_OUTPUT("OPEN_PARENTESES");
             lex_next_token();
             leaf = expr();
             parser_expect(cparenteses);
-            parser_verbose("CLOSE_PARENTESES");
+            DEBUG_OUTPUT("CLOSE_PARENTESES");
             lex_next_token();
     }else{
-        parser_verbose("Syntax error: Cannot be -->> %s <<-- here", lex_tk->raw_value);
+        DEBUG_OUTPUT("Syntax error: Cannot be -->> %s <<-- here", lex_tk->raw_value);
         lex_terminator();
     }   
     return leaf;     
@@ -217,10 +248,10 @@ struct ast_node* factor(){
 
 void expr_list(){
     if(parser_accept(cparenteses)){
-        parser_verbose("No arguments captured");
+        DEBUG_OUTPUT("No arguments captured");
     }else{
         do{            
-            parser_verbose("Capturing expression argument...");
+            DEBUG_OUTPUT("Capturing expression argument...");
             expr();               
             if(TOKEN != comma){
                 break;

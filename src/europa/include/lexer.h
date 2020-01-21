@@ -31,18 +31,27 @@ FILE *LEX_INPUT;
 typedef enum {
     undefined = -1,   
     eof = 0,
-    newline,  
+    newline, // \n 
     integer, 
     string,
-    boolean,
+    boolean, // 'true' or 'false'
     reference,
-    plus, 
-    minus,
-    multiply,
-    division,    
-    assign,
-    ocurlybrc, // open curly braces
-    ccurlybrc, // close curly braces
+    plus, // +
+    minus, // -
+    multiply, // *
+    division, // /
+    assign, // = 
+    negation, // !
+    equal, // == 
+    notequal, // not equal != 
+    gt, // greater than >
+    lt, // less than <
+    gte, // greater than or equal >=
+    lte, // less than or equal <=    
+    andoper, // and operator 'and' 
+    oroper, // or operator 'or'
+    ocurlybrc, // open curly braces {
+    ccurlybrc, // close curly braces }
     oparenteses,
     cparenteses,
     comma,
@@ -52,7 +61,8 @@ typedef enum {
     defcmd,
     includecmd,
     fcall,
-    expression
+    expression,
+    returncmd
 } lex_token_class;
 
 // Struct to store a lex token 

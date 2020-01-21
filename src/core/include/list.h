@@ -14,7 +14,9 @@ struct list_item {
     void *data;     
 };
 
-
+struct list *list_factory();
+struct list_item *list_item_factory();
+struct list *list_create();
 void list_dump(struct list *list);
 void list_add_item(struct list *list, void *data);
 void list_remove_item(struct list *list, void *data);
