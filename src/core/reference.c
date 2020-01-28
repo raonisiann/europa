@@ -7,33 +7,29 @@
 
 extern hashtable* symbols;
 
-struct e_reference *reference_factory(){
-	return (struct e_reference *)memm_alloc(sizeof(struct e_reference));
-}
-
-struct e_value *reference_eval(struct ast_node *n){	
+struct e_value *reference_eval(struct e_reference *ref){	
 	struct ht_entry *result = NULL;
-	result = ht_get(symbols, n->token->raw_value);
+	result = ht_get(symbols, ref->name);
 	if(result){
 		DEBUG_OUTPUT("REFERENCE_FOUND");
 		return result->data->value;
 	}else{
-		EUROPA_ERROR("Reference '%s' not found", n->token->raw_value);
+		EUROPA_ERROR("Reference '%s' not found", ref->name);
 		return NULL;
 	}
 }
 
-void assignment_eval(struct ast_assignment_node *node){
+void assignment_eval(struct e_assignment *assignment){
 	// 
-	DEBUG_OUTPUT("NEW_REFERENCE '%s'", node->reference->token->raw_value);
-	struct e_value *expr_value = expr_eval(node->assigment);	
-	create_reference(node->reference->token->raw_value, expr_value);
+	DEBUG_OUTPUT("NEW_REFERENCE '%s'", assignment->ref->name);
+	create_reference(assignment->ref->name, expr_eval(assignment->ast));
 }
 
 
 void create_reference(char *name, struct e_value *value){    
-	struct e_reference *ref = reference_factory();
+	struct e_reference *ref = factory_reference();
 	ref->name = name; 
+	ref->type = e_reference;
 	ref->value = value;
 	ref->ht_hash = ht_key_calc(name);
 

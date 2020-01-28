@@ -19,6 +19,6 @@ struct ast_node* factor();
 // statement(s) inside the '{' STMT_BLOCK '}'
 struct list *stmt_block();
 // expressions separated by ','
-void expr_list();
+struct list *expr_list();
 
 #endif

@@ -3,21 +3,41 @@
 #include "lexer.h"
 #include "europa_types.h"
 
+
+typedef enum {
+    node_undefined = -1,
+    node_token = 1, 
+    node_value,
+    node_reference
+} ast_node_type;
+
+
 struct ast_node {
+    char type; 
     struct ast_node *left; 
-    struct ast_node *right;
-    struct lex_token *token;
+    struct ast_node *right;    
+    union {
+        struct lex_token *token;
+        struct e_value *val;
+        struct e_reference *ref;
+    };
 };
+
 
 struct ast_assignment_node {
     struct ast_node *reference;
     struct ast_node *assigment;
 };
 
-struct ast_node* ast_add_node(struct lex_token *t, struct ast_node *l, struct ast_node *r);
-struct ast_node* ast_factory_node();
+struct ast_node *ast_add_node(struct lex_token *t, struct ast_node *l, struct ast_node *r);
+
+struct ast_node *ast_add_token_node(struct lex_token *t, struct ast_node *l, struct ast_node *r);
+struct ast_node *ast_add_value_node(struct e_value *val, struct ast_node *l, struct ast_node *r);
+struct ast_node *ast_add_reference_node(struct e_reference *ref, struct ast_node *l, struct ast_node *r);
+
+struct ast_node *ast_factory_node();
 struct ast_assignment_node *ast_factory_assignment_node();
-struct ast_assignment_node* ast_create_assignment(struct ast_node *ref, struct ast_node *assign);
+struct ast_assignment_node *ast_create_assignment(struct ast_node *ref, struct ast_node *assign);
 void ast_free(struct ast_node *node);
 
 

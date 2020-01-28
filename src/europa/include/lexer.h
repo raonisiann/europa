@@ -52,8 +52,11 @@ typedef enum {
     oroper, // or operator 'or'
     ocurlybrc, // open curly braces {
     ccurlybrc, // close curly braces }
-    oparenteses,
-    cparenteses,
+    osqbrackets, // open square brackets [
+    csqbrackets, // close square brackets ]
+    oparenteses, // open parenteses (
+    cparenteses, // close parenteses )
+    colon, // colon : 
     comma,
     ifcmd,
     elsecmd, 
@@ -71,7 +74,7 @@ typedef enum {
 struct lex_token {
     lex_token_class class;
     unsigned int size; 
-    char *raw_value;
+    char *raw_value;    
 };
 
 struct reserved_word {

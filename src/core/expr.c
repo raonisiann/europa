@@ -11,58 +11,16 @@
 #include "europa_error.h"
 
 
-/*
-struct e_value *set_variable_value(char sym[32]){
-    struct e_value *d = (struct e_value *)memm_alloc(sizeof(struct e_value)); 
-    d->type = 'V'; // string type
-    d->ht_hash = ht_key_calc(sym);
-    d->str = strdup(sym);   
-    d->func = NULL;
-    return d; 
-}
-*/
-
-/*
-struct e_value *set_fcall_value(struct func_def *f){
-    struct e_value *d = (struct e_value *)memm_alloc(sizeof(struct e_value)); 
-    d->type = 'C'; // function call value
-    d->ht_hash = ht_key_calc(f->name);    
-    d->func = f; 
-    return d; 
-}
-*/
-
-// Set the token type
-// like '*', '/', etc... used to build
-// the ASTs
-struct e_value *set_token_type(char value){
-    struct e_value *d = (struct e_value *)memm_alloc(sizeof(struct e_value));
-    d->type = value;    
-    return d;    
-}
-
-/*
-bool get_bool_value(struct ast_node *n){
-    return n->data->boolean;
-}
-*/
-
-/*
-char *get_string_value(struct ast_node *n){
-    return n->data->str;
-}
-*/
-
 struct e_value *do_arithmetic_sum(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value();
-	if(l->type == string || r->type == string){
+	if(l->type == e_string || r->type == e_string){
 		// this is considered an string concatenation
 		res->str = do_string_concat(l, r);
-		res->type = string;
+		res->type = e_string;
         res->size = l->size + r->size;
 	}else{
 		res->num = l->num + r->num;
-		res->type = integer;
+		res->type = e_int;
 	}    
     return res;
 }
@@ -70,37 +28,37 @@ struct e_value *do_arithmetic_sum(struct e_value *l, struct e_value *r){
 struct e_value *do_arithmetic_subtract(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value();
     res->num = l->num - r->num;
-    res->type = integer;
+    res->type = e_int;
     return res;
 }
 
 struct e_value *do_arithmetic_multiply(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value();
     res->num = l->num * r->num;
-    res->type = integer;
+    res->type = e_int;
     return res;
 }
 
 struct e_value *do_arithmetic_division(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value();
     res->num = (l->num / r->num);
-    res->type = integer;
+    res->type = e_int;
     return res;
 }
 
 // Do the 'equal' logic
 struct e_value *do_logical_equal(struct e_value *l, struct e_value *r){   
     struct e_value *res = factory_value(); 
-    if(l->type == integer && r->type == integer){
+    if(l->type == e_int && r->type == e_int){
         res->boolean = is_number_equal(l->num, r->num);
-    }else if(l->type == boolean && r->type == boolean){
+    }else if(l->type == e_boolean && r->type == e_boolean){
         res->boolean = is_bool_equal(l->boolean, r->boolean);
-    }else if(l->type == string && r->type == string){
+    }else if(l->type == e_string && r->type == e_string){
         res->boolean = is_string_equal(l->str, r->str);
     }else{
         EUROPA_ERROR("You cannot compare a type of '%c' with '%c'\n", l->type, r->type);        
     }
-    res->type = boolean;
+    res->type = e_boolean;
     return res;
 }
 
@@ -108,16 +66,16 @@ struct e_value *do_logical_equal(struct e_value *l, struct e_value *r){
 // Do the 'not equal' (!=) logic
 struct e_value *do_logical_not_equal(struct e_value *l, struct e_value *r){   
     struct e_value *res = factory_value(); 
-    if(l->type == integer && r->type == integer){
+    if(l->type == e_int && r->type == e_int){
         res->boolean = is_number_not_equal(l->num, r->num);
-    }else if(l->type == boolean && r->type == boolean){
+    }else if(l->type == e_boolean && r->type == e_boolean){
         res->boolean = is_bool_not_equal(l->boolean, r->boolean);
-    }else if(l->type == string && r->type == string){
+    }else if(l->type == e_string && r->type == e_string){
         res->boolean = is_string_not_equal(l->str, r->str);
     }else{
         EUROPA_ERROR("You cannot compare a type of '%c' with '%c'\n", l->type, r->type);        
     }
-    res->type = boolean;
+    res->type = e_boolean;
     return res;
 }
 
@@ -128,7 +86,7 @@ struct e_value *do_logical_and(struct e_value *l, struct e_value *r){
     }else{
         res->boolean = e_false;
     }         
-    res->type = boolean;
+    res->type = e_boolean;
     return res;
 }
 
@@ -139,13 +97,13 @@ struct e_value *do_logical_or(struct e_value *l, struct e_value *r){
     }else{
         res->boolean = e_false;
     }         
-    res->type = boolean;
+    res->type = e_boolean;
     return res;
 }
 
 struct e_value *do_logical_greater_then(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value(); 
-    if(l->type == integer && r->type == integer){
+    if(l->type == e_int && r->type == e_int){
         if(l->num > r->num){
             res->boolean = e_true;
         }else{
@@ -154,13 +112,13 @@ struct e_value *do_logical_greater_then(struct e_value *l, struct e_value *r){
     }else{
         EUROPA_ERROR("Greater than only supports integer operators\n");
     }
-    res->type = boolean;
+    res->type = e_boolean;
     return res;   
 }
 
 struct e_value *do_logical_greater_then_or_equal(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value(); 
-    if(l->type == integer && r->type == integer){
+    if(l->type == e_int && r->type == e_int){
         if(l->num >= r->num){
             res->boolean = e_true;
         }else{
@@ -169,13 +127,13 @@ struct e_value *do_logical_greater_then_or_equal(struct e_value *l, struct e_val
     }else{
         EUROPA_ERROR("Greater than or equal only supports integer operators");
     }
-    res->type = boolean;
+    res->type = e_boolean;
     return res;
 }
 
 struct e_value *do_logical_less_then(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value();     
-    if(l->type == integer && r->type == integer){
+    if(l->type == e_int && r->type == e_int){
         if(l->num < r->num){
             res->boolean = e_true;
         }else{
@@ -184,13 +142,13 @@ struct e_value *do_logical_less_then(struct e_value *l, struct e_value *r){
     }else{
         EUROPA_ERROR("Less than only supports integer operators");
     }
-    res->type = boolean;
+    res->type = e_boolean;
     return res;    
 }
 
 struct e_value *do_logical_less_then_or_equal(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value();     
-    if(l->type == integer && r->type == integer){        
+    if(l->type == e_int && r->type == e_int){        
         if(l->num <= r->num){
             res->boolean = e_true;
         }else{
@@ -199,7 +157,7 @@ struct e_value *do_logical_less_then_or_equal(struct e_value *l, struct e_value 
     }else{
         EUROPA_ERROR("Less than or equal only supports integer operators");
     }
-    res->type = boolean;
+    res->type = e_boolean;
     return res;   
 }
 
@@ -273,14 +231,14 @@ char *do_string_concat(struct e_value *str1, struct e_value *str2){
 char *convert_to_string_value(struct e_value *v){
 	char number_temp[21];	
 	switch(v->type){
-		case integer:			
+		case e_int:			
 			snprintf(number_temp, 21, "%i", v->num);
 			//return strndup(number_temp, strlen(number_temp));					    
             return _STRING_DUP(number_temp);
-		case string:
+		case e_string:
 			//return strndup(v->str, strlen(v->str));		
             return _STRING_DUP(number_temp);
-		case boolean:			
+		case e_boolean:			
 			if(v->boolean == 0){
 				v->str = (char *)memm_alloc(sizeof(char) * 6);
 				strncpy(v->str, "e_false\0", 6);
@@ -290,7 +248,7 @@ char *convert_to_string_value(struct e_value *v){
 			}
 			return v->str;
 		break;
-		case 'U':
+		case e_undefined:
 			// return a empty string for this case
 			v->str = (char *)memm_alloc(sizeof(char));
 			strncpy(v->str, "\0", 1);
@@ -328,13 +286,13 @@ int do_number_compare(int n1, int n2){
 
 void value_eval(struct e_value *v){	
     switch(v->type){
-        case string:                           
+        case e_string:                           
             EUROPA_OUTPUT("%s\n", v->str);
             break;
-        case integer:                      
+        case e_int:                      
             EUROPA_OUTPUT("%i\n", v->num);
             break; 
-        case boolean:                        
+        case e_boolean:                        
             switch(v->boolean){
                 case e_true: 
                     EUROPA_OUTPUT("true\n");
@@ -346,13 +304,14 @@ void value_eval(struct e_value *v){
                     EUROPA_ERROR("internal error: Unknown boolean value");
             }
             break;  
-		case undefined:
+		case e_undefined:
 			// A value was undefined. Nothing to do
 			// This is common in functions that 
 			// doesn't return any value.
 			// All function calls are initialized with 'U'
 			// return value;
-			return;		    
+            EUROPA_ERROR("internal error: Undefined value");
+			   
         default:
 			return;
             EUROPA_ERROR("internal error: Unkown variable type '%c'", v->type);
@@ -372,61 +331,74 @@ struct e_value *expr_eval(struct ast_node *n){
         r = expr_eval(n->right);        
     }
 
-    switch(n->token->class){    
-        case boolean:
-			return create_boolean_value(n->token);
-		break;
-        case integer:
-			return create_int_value(n->token);
-		break;
-        case string:
-			return create_string_value(n->token);            
-        break;           
-        case andoper: // and
-            return do_logical_and(l, r);            
-        break;  
-		case 'C':
-            //return function_eval(n->data);			
-		break;
-        case equal: // equal         
-            return do_logical_equal(l, r);
-        break; 
-        case gt: // greater than
-            return do_logical_greater_then(l, r); 
-        break;        
-        case gte: // greater than or equal
-            return do_logical_greater_then_or_equal(l, r); 
-        break;       
-        case lt: // less than
-            return do_logical_less_then(l, r); 
-        break;        
-        case lte: // less than or equal
-            return do_logical_less_then_or_equal(l, r); 
-        break;                                 
-        case notequal: // not equal
-            return do_logical_not_equal(l, r);
-        break;        
-        case oroper: // or   
-            return do_logical_or(l, r); 
-        break;        
-        case reference:                                                  
-            // return var_eval_with_hash(n->token);                        
-            return reference_eval(n);
-        break;
-        case plus:
-            return do_arithmetic_sum(l, r);
-        break;
-        case minus:
-            return do_arithmetic_subtract(l, r);
-        break;
-        case multiply:
-            return do_arithmetic_multiply(l, r);
-        break;
-        case division:        
-            return do_arithmetic_division(l, r);
-        break;
-        default:
-            EUROPA_ERROR("Unknow node type '%c'\n", n->token->class);        
+    switch(n->type){
+        case node_reference:
+            switch(n->ref->type){
+                case e_reference:                                                  
+                    // return var_eval_with_hash(n->token);                        
+                    return reference_eval(n->ref);                    
+                case e_fcall:
+                    // function call eval... 
+                    break;
+                default: 
+                    EUROPA_ERROR("internal error: Unknown reference node type '%i'\n", n->ref->type); 
+            }                        
+        // values 
+        case node_value: 
+            switch(n->val->type){
+                case e_boolean:
+                    return n->val;                
+                case e_int:
+                    return n->val;                
+                case e_string:
+                    return n->val;                                            
+                default:
+                    EUROPA_ERROR("internal error: Unknown value node type '%i'\n", n->ref->type);  
+            }                        
+        // tokens..     
+        case node_token:
+            switch(n->token->class){             
+                case andoper: // and
+                    return do_logical_and(l, r);            
+                break;  
+                case equal: // equal         
+                    return do_logical_equal(l, r);
+                break; 
+                case gt: // greater than
+                    return do_logical_greater_then(l, r); 
+                break;        
+                case gte: // greater than or equal
+                    return do_logical_greater_then_or_equal(l, r); 
+                break;       
+                case lt: // less than
+                    return do_logical_less_then(l, r); 
+                break;        
+                case lte: // less than or equal
+                    return do_logical_less_then_or_equal(l, r); 
+                break;                                 
+                case notequal: // not equal
+                    return do_logical_not_equal(l, r);
+                break;        
+                case oroper: // or   
+                    return do_logical_or(l, r); 
+                break;        
+                case plus:
+                    return do_arithmetic_sum(l, r);
+                break;
+                case minus:
+                    return do_arithmetic_subtract(l, r);
+                break;
+                case multiply:
+                    return do_arithmetic_multiply(l, r);
+                break;
+                case division:        
+                    return do_arithmetic_division(l, r);
+                break;
+                default:
+                    EUROPA_ERROR("internal error: Unknow token node type '%c'\n", n->token->class);        
+            }        
+            break;          
     }
+    EUROPA_ERROR("internal error: Unable to handle node of type '%i'\n", n->type); 
 }
 

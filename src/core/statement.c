@@ -34,10 +34,11 @@ struct e_stmt *stmt_create_flow(unsigned int type, struct e_flow *flow){
     return newstmt;
 }
 
-struct e_stmt *stmt_create_assign(struct ast_assignment_node *a){
+struct e_stmt *stmt_create_assign(struct e_assignment *assignment){
     struct e_stmt *newstmt = stmt_factory();
     newstmt->type = assign;
-    newstmt->assign = a; 
+    newstmt->assign = assignment; 
+    return newstmt;
 }
 
 

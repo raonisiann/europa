@@ -7,7 +7,12 @@
 
 // create ast node 
 struct ast_node *ast_factory_node(){
-    return ((struct ast_node *)memm_alloc(sizeof(struct ast_node)));
+    struct ast_node *new_node = ((struct ast_node *)memm_alloc(sizeof(struct ast_node)));
+    new_node->type = node_undefined;
+    new_node->left = NULL;
+    new_node->right = NULL;
+    new_node->val = NULL;
+    return new_node;
 }
 
 // create an ast assignment node 
@@ -30,6 +35,33 @@ struct ast_node* ast_add_node(struct lex_token *t, struct ast_node *l, struct as
     n->right = r;
     n->token = t;
     return n;
+}
+
+struct ast_node *ast_add_token_node(struct lex_token *t, struct ast_node *l, struct ast_node *r){
+    struct ast_node* n = ast_factory_node(); 
+    n->type = node_token;
+    n->left = l;
+    n->right = r;
+    n->token = t;
+    return n;    
+}
+
+struct ast_node *ast_add_value_node(struct e_value *val, struct ast_node *l, struct ast_node *r){
+    struct ast_node* n = ast_factory_node(); 
+    n->type = node_value;
+    n->left = l;
+    n->right = r;
+    n->val = val;
+    return n;   
+}
+
+struct ast_node *ast_add_reference_node(struct e_reference *ref, struct ast_node *l, struct ast_node *r){
+    struct ast_node* n = ast_factory_node(); 
+    n->type = node_reference;
+    n->left = l;
+    n->right = r;
+    n->ref = ref;
+    return n;       
 }
 
 // free node 

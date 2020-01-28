@@ -102,7 +102,7 @@ void lex_next_token(){
             case '\n':
                 // new line capture                 
                 lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
-                lex_cur_line++;    
+                lex_cur_line++;                                 
                 break;
             case '"':
                 // start string capture   
@@ -144,6 +144,15 @@ void lex_next_token(){
             case '}':
                 lex_tk = lex_create_tk(ccurlybrc, 1, "}");
                 break;
+            case '[':
+                lex_tk = lex_create_tk(osqbrackets, 1, "[");
+                break;
+            case ']':
+                lex_tk = lex_create_tk(csqbrackets, 1, "]");
+                break;     
+            case ':':
+                lex_tk = lex_create_tk(colon, 1, ":");
+                break;                            
             case '(':
                 lex_tk = lex_create_tk(oparenteses, 1, "(");
                 break;

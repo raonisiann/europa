@@ -21,6 +21,8 @@ int main(int argc, char *argv[]){
     // 
     symbols = ht_init(100);
 
+    printf("Europa 0.1 \n");
+    
     // do what you have to do
     return parser_start();    
 }
