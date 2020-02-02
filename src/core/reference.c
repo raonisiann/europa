@@ -61,7 +61,7 @@ struct e_value *function_eval(struct ast_node *fcall_node){
 		}
 		return NULL;
 	}else{
-		DEBUG_OUTPUT("Reference for function '%s' not found\n", fcall_node->fcall->func->raw_value);
+		EUROPA_ERROR("Reference for function '%s' not found\n", fcall_node->fcall->func->raw_value);
 		return NULL;
 	}
 }
