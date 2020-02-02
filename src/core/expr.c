@@ -41,9 +41,9 @@ struct e_value *do_arithmetic_multiply(struct e_value *l, struct e_value *r){
 
 struct e_value *do_arithmetic_division(struct e_value *l, struct e_value *r){
     struct e_value *res = factory_value();
-    if(l->type != e_int || r->type == e_int){
+    if(l->type != e_int || r->type != e_int){
         EUROPA_ERROR("Arithmetic division is only supported by numbers. Not '%c' with '%c'\n", l->type, r->type);          
-    }
+    }    
     res->num = (l->num / r->num);
     res->type = e_int;
     return res;
