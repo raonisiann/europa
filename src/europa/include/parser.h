@@ -20,5 +20,7 @@ struct ast_node* factor();
 struct list *stmt_block();
 // expressions separated by ','
 struct list *expr_list();
+struct list *get_func_arg_symbols();
+void func_def();
 
 #endif

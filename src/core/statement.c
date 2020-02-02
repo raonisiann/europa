@@ -1,8 +1,4 @@
-
-//#include "sd_types.h"
 #include "ast.h"
-//#include "sd_debug.h"
-//#include "branchs.h"
 #include "memm.h"
 #include "statement.h"
 #include "expr.h"
@@ -10,10 +6,6 @@
 #include "flow.h"
 #include "europa_debug.h"
 #include "europa_error.h"
-//#include "variables.h"
-//#include "sd_lex.h"
-//#include "loops.h"
-//#include "types_operations.h"
 
 
 struct e_stmt *stmt_factory(){
@@ -22,7 +14,7 @@ struct e_stmt *stmt_factory(){
 
 struct e_stmt *stmt_create_expr(struct ast_node *n){
     struct e_stmt *newstmt = stmt_factory();
-    newstmt->type = expression;	
+    newstmt->type = s_expr;	
     newstmt->expr = n;    
     return newstmt;    
 }
@@ -34,44 +26,45 @@ struct e_stmt *stmt_create_flow(unsigned int type, struct e_flow *flow){
     return newstmt;
 }
 
-struct e_stmt *stmt_create_assign(struct e_assignment *assignment){
+struct e_stmt *stmt_create_assign(struct ast_node *n){
     struct e_stmt *newstmt = stmt_factory();
-    newstmt->type = assign;
-    newstmt->assign = assignment; 
+    newstmt->type = s_assign;
+    newstmt->expr = n; 
     return newstmt;
+}
+
+struct e_stmt *stmt_create_func_def(struct e_reference *func_def){
+    struct e_stmt *newstmt = stmt_factory();
+    newstmt->type = s_func_def;
+    newstmt->func_def = func_def; 
+    return newstmt;    
 }
 
 
 void stmt_eval(struct e_stmt *stmt){    
     switch(stmt->type){
-        case 'C': 
-			//DEBUG_OUTPUT("Starting eval of an C\n");		
-			//ast_eval(stmt->data.ast, c);
+        case s_assign: 
+            // Assignment eval			 
+            DEBUG_OUTPUT("ASSIGNMENT_EVAL\n");
+            assignment_eval(stmt->expr->assign->reference, stmt->expr->assign->expr);
             break;
-        case assign: // Assignment eval			 
-            DEBUG_OUTPUT("ASSIGNMENT_EVAL");
-            assignment_eval(stmt->assign);
-            break;
-        case expression: // Expression statement            	
+        case s_expr: 
+            // Expression statement            	
             DEBUG_OUTPUT("EXPR_EVAL");
             value_eval(expr_eval(stmt->expr));				            
             break;
-        case ifcmd: 
+        case s_if_flow: 
             // if statement eval
             DEBUG_OUTPUT("IF_EVAL");
             if_stmt_eval(stmt->flow, NULL);
             break;
-        case whilecmd: 
+        case s_while_flow: 
             // While statement eval
             DEBUG_OUTPUT("WHILE_EVAL");
             while_stmt_eval(stmt->flow, NULL);
             break;        
-		case 'R':			
-			//c->retval = ast_eval(stmt->data.ast, c);
-			//DEBUG_OUTPUT("RETURN VAL type '%c'\n", c->retval->type);
-            break;
 		break;
         default:
-            EUROPA_ERROR("Unable to evaluate statement of type %c\n", stmt->type);            
+            EUROPA_ERROR("Unable to evaluate statement of type '%i'\n", stmt->type);            
     }
 }

@@ -18,7 +18,8 @@ typedef enum {
     e_string, 
     e_boolean, 
     e_reference,
-    e_fcall
+    e_fcall,
+    e_fdef
 } e_type; 
 
 struct e_array {
@@ -47,6 +48,7 @@ struct e_reference {
     union {
         struct e_value *value;       
         struct e_fcall *fcall;
+        struct e_func_def *funcdef; 
     };
     unsigned int ht_hash;
 };
@@ -54,6 +56,11 @@ struct e_reference {
 struct e_assignment {
     struct e_reference *ref; 
     struct ast_node *ast;
+};
+
+struct e_func_def {
+    struct list *arg_list; // list of... 
+    struct list *body; // list of e_stmt 
 };
 
 
@@ -64,7 +71,9 @@ struct e_value *token_to_string(struct lex_token *token);
 struct e_value *token_to_boolean(struct lex_token *token);
 struct e_reference *factory_reference();
 struct e_reference *new_reference(char *ref_name, struct e_value *val);
-struct e_reference *new_fcall(char *func_name, struct list *args);
+struct e_reference *new_fcall(struct e_reference *ref, struct list *args);
+struct e_reference *new_fdef(struct lex_token *ref_tk, struct list *args, struct list *body);
 struct e_fcall *factory_fcall();
+struct e_func_def *factory_fdef();
 
 #endif

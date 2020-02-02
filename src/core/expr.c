@@ -288,36 +288,38 @@ int do_number_compare(int n1, int n2){
 }
 
 void value_eval(struct e_value *v){	
-    switch(v->type){
-        case e_string:                           
-            EUROPA_OUTPUT("%s\n", v->str);
-            break;
-        case e_int:                      
-            EUROPA_OUTPUT("%i\n", v->num);
-            break; 
-        case e_boolean:                        
-            switch(v->boolean){
-                case e_true: 
-                    EUROPA_OUTPUT("true\n");
-                    break;
-                case e_false:
-                    EUROPA_OUTPUT("false\n");
-                    break;
-                default:
-                    EUROPA_ERROR("internal error: Unknown boolean value");
-            }
-            break;  
-		case e_undefined:
-			// A value was undefined. Nothing to do
-			// This is common in functions that 
-			// doesn't return any value.
-			// All function calls are initialized with 'U'
-			// return value;
-            EUROPA_ERROR("internal error: Undefined value");
-			   
-        default:
-			return;
-            EUROPA_ERROR("internal error: Unkown variable type '%c'", v->type);
+    if(v != NULL){
+        switch(v->type){
+            case e_string:                           
+                EUROPA_OUTPUT("%s\n", v->str);
+                break;
+            case e_int:                      
+                EUROPA_OUTPUT("%i\n", v->num);
+                break; 
+            case e_boolean:                        
+                switch(v->boolean){
+                    case e_true: 
+                        EUROPA_OUTPUT("true\n");
+                        break;
+                    case e_false:
+                        EUROPA_OUTPUT("false\n");
+                        break;
+                    default:
+                        EUROPA_ERROR("internal error: Unknown boolean value");
+                }
+                break;  
+            case e_undefined:
+                // A value was undefined. Nothing to do
+                // This is common in functions that 
+                // doesn't return any value.
+                // All function calls are initialized with 'U'
+                // return value;
+                EUROPA_ERROR("internal error: Undefined value");
+                
+            default:
+                return;
+                EUROPA_ERROR("internal error: Unkown variable type '%c'", v->type);
+        }
     }	
 }
 
@@ -335,17 +337,6 @@ struct e_value *expr_eval(struct ast_node *n){
     }
 
     switch(n->type){
-        case node_reference:
-            switch(n->ref->type){
-                case e_reference:                                                  
-                    // return var_eval_with_hash(n->token);                        
-                    return reference_eval(n->ref);                    
-                case e_fcall:
-                    // function call eval... 
-                    break;
-                default: 
-                    EUROPA_ERROR("internal error: Unknown reference node type '%i'\n", n->ref->type); 
-            }                        
         // values 
         case node_value: 
             switch(n->val->type){
@@ -356,11 +347,17 @@ struct e_value *expr_eval(struct ast_node *n){
                 case e_string:
                     return n->val;                                            
                 default:
-                    EUROPA_ERROR("internal error: Unknown value node type '%i'\n", n->ref->type);  
+                    EUROPA_ERROR("internal error: Unknown value node type '%i'\n", n->val->type);  
             }                        
-        // tokens..     
+        case node_fcall:
+
+        // tokens.. 
+        case node_reference:   
+            return function_eval(n);         
         case node_token:
-            switch(n->token->class){             
+            switch(n->token->class){       
+                case reference:                                         
+                    return reference_eval(n);                                    
                 case andoper: // and
                     return do_logical_and(l, r);            
                 break;  
