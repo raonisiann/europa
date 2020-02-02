@@ -5,7 +5,7 @@
 
 FILE *fp = NULL;
 
-void sd_debug_output(char *s, ...){    
+void europa_debug_output(char *s, ...){    
     va_list ap;
     va_start(ap, s);  
     vfprintf(fp, s, ap);
@@ -14,14 +14,14 @@ void sd_debug_output(char *s, ...){
 }
 
 // initialize debug log file
-void sd_debug_init(){	
+void europa_debug_init(){	
 	if(fp == NULL){
 		fp = fopen("debug.txt", "a");    
 	} 	
 }
 
 // Close the debug log file
-void sd_debug_end(){
+void europa_debug_end(){
 	if(fp != NULL){
 		fclose(fp);
 	}

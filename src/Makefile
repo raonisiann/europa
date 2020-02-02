@@ -10,7 +10,7 @@ export DEBUG_GCC_FLAGS=-O0 -DDEBUG -ggdb
 all:
 	$(CCOMPILER) -o $(EXEC_FILE_NAME) $(INCLUDE_DIR) $(GCC_FLAGS) $(INCLUDE_FILES) $(LINKER_FLAGS)
 
-debug: debug_parser scanner
+debug_enabled:
 	$(CCOMPILER) -o $(EXEC_FILE_NAME) $(INCLUDE_DIR) $(DEBUG_GCC_FLAGS) $(INCLUDE_FILES) $(LINKER_FLAGS)
 	
 clean: 
