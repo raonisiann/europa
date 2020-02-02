@@ -9,6 +9,7 @@ void europa_debug_output(char *s, ...){
     va_list ap;
     va_start(ap, s);  
     vfprintf(fp, s, ap);
+	fprintf(fp, "\n");
     va_end(ap);
     fflush(fp);
 }

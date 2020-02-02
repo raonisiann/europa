@@ -7,6 +7,7 @@
 #include "memm.h"
 #include "europa_std.h"
 #include "europa_debug.h"
+#include "europa_error.h"
 
 struct lex_token *lex_tk;
 
@@ -86,24 +87,32 @@ void lex_next_token(){
     lex_ignore_white_spaces();  
     
     // TODO: if end of file return LEX_EOF
-    // TODO: if start with //, comment    
-    if(isdigit(lex_cur_ch)){
+    // TODO: if start with //, comment   
+    if(feof(LEX_INPUT)){
+        lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");         
+    }else if(isdigit(lex_cur_ch)){
         // start digit/number capture         
         lex_tk = lex_cap_digit();
     }else if(isalpha(lex_cur_ch)){        
         // start identifier/keyword capture         
-        lex_tk = lex_cap_reference();
+        lex_tk = lex_cap_reference();    
     }else{
         switch(lex_cur_ch){
-            case EOF:
-                // end of the file... 
-                lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");    
-                break;
             case '\n':
                 // new line capture                 
                 lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
                 lex_cur_line++;                                 
                 break;
+            case '\r':
+                lex_next_char();
+                if(lex_cur_ch == '\n'){
+                    // new line capture                 
+                    lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
+                    lex_cur_line++;     
+                    break;                  
+                }else{
+                    EUROPA_ERROR("Unable to handler non-newline after return. Expected '\\r\\n'.");
+                }
             case '"':
                 // start string capture   
                 lex_tk = lex_cap_string(); 
@@ -181,7 +190,7 @@ void lex_next_token(){
                 }                
                 break;                                             
             default: 
-                printf("Unable to handle character '%c' at position %i line %i\n", lex_cur_ch, lex_cur_ch_pos, lex_cur_line);
+                EUROPA_ERROR("Unable to handle character '%c' at position %i line %i\n", lex_cur_ch, lex_cur_ch_pos, lex_cur_line);
                 lex_terminator();
         }        
     }       
@@ -333,7 +342,7 @@ void lex_ignore_white_spaces(){
 // Move forward the cursor to next available char
 void lex_next_char(){          
     lex_prev_ch = lex_cur_ch; 
-    lex_cur_ch = getc(LEX_INPUT);	
+    lex_cur_ch = getc(LEX_INPUT);
     lex_cur_ch_pos++;     
 }
 

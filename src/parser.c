@@ -47,19 +47,21 @@ void lang(){
         if(parser_accept(newline)){
             DEBUG_OUTPUT("Captured -> new line");                         
             lex_next_token();                                         
-        }else if(TOKEN == eof){
+        }else if(parser_accept(eof)){
             DEBUG_OUTPUT("Captured -> End of file");   
-        }else if(TOKEN == defcmd){     
+            break;
+        }else if(parser_accept(defcmd)){     
             // function definition
             // def FUNC_NAME '(' FUNC_ARGS ')' '{' FUNC_BODY '}'  
-            DEBUG_OUTPUT("STARTING FUNCTION_DEFINITION\n");                      
+            DEBUG_OUTPUT("STARTING FUNCTION_DEFINITION");                      
             func_def();
-            DEBUG_OUTPUT("ENDING FUNCTION_DEFINITION\n");
+            DEBUG_OUTPUT("ENDING FUNCTION_DEFINITION");
             //lex_next_token();
         }else{
             struct e_stmt *_stmt = NULL;
-            _stmt = stmt();
+            _stmt = stmt();            
             parser_expect(newline);               
+            DEBUG_OUTPUT("EVALUATING STATEMENT");
             if(_stmt != NULL){
                 // eval statement....
                 stmt_eval(_stmt);
@@ -118,7 +120,7 @@ struct e_stmt *stmt(){
         return stmt_create_flow(s_while_flow, flow_create(condition, while_block, NULL));      
     }else{
     // EXPR, ASSINGMENT 
-        DEBUG_OUTPUT("EXPR\n");
+        DEBUG_OUTPUT("EXPR");
         struct ast_node* _expr = NULL;
         _expr = expr();         
         if(parser_accept(assign)){                       
@@ -144,7 +146,7 @@ struct list *stmt_block(){
         lex_next_token();        
     }
     if(parser_accept(ocurlybrc)){
-        DEBUG_OUTPUT("OPEN_CURLY_BRACES\n");
+        DEBUG_OUTPUT("OPEN_CURLY_BRACES");
         struct e_stmt *stmt_item = NULL;
         lex_next_token();           
         while(TOKEN != ccurlybrc){
@@ -154,7 +156,7 @@ struct list *stmt_block(){
             }                     
         }
         parser_expect(ccurlybrc);
-        DEBUG_OUTPUT("CLOSE_CURLY_BRACES\n");
+        DEBUG_OUTPUT("CLOSE_CURLY_BRACES");
         lex_next_token();        
     }else{
         DEBUG_OUTPUT("Something else");      
@@ -249,18 +251,18 @@ struct ast_node* factor(){
         leaf = ast_add_value_node(token_to_boolean(lex_tk),  NULL, NULL); 
         lex_next_token();        
     }else if(parser_accept(reference)){    
-        DEBUG_OUTPUT("REFERENCE\n");
+        DEBUG_OUTPUT("REFERENCE");
         struct lex_token *ref_tk = lex_tk;         
         lex_next_token();      
         // if is an assigment return immediately to statement function
         if(parser_accept(assign)){              
             return ast_add_assign_node(ref_tk, NULL);                       
         }else if(parser_accept(oparenteses)){            
-            DEBUG_OUTPUT("FUNCTION CALL STARTED\n");
+            DEBUG_OUTPUT("FUNCTION CALL STARTED");
             lex_next_token();            
             leaf = ast_add_fcall_node(ref_tk, expr_list());            
             parser_expect(cparenteses);
-            DEBUG_OUTPUT("FUNCTION CALL ENDED\n");
+            DEBUG_OUTPUT("FUNCTION CALL ENDED");
             lex_next_token();                        
         }else{
             leaf = ast_add_token_node(ref_tk, NULL, NULL);    
@@ -309,7 +311,7 @@ struct list *get_func_arg_symbols(){
         }while(1);      
     }  
     parser_expect(cparenteses);
-    DEBUG_OUTPUT("MATCHING CLOSE_PARENTESES\n");
+    DEBUG_OUTPUT("MATCHING CLOSE_PARENTESES");
     return func_arg_list;
 }
 
@@ -320,7 +322,7 @@ struct list *expr_list(){
     }else{              
         struct ast_node *li = NULL;
         do{            
-            DEBUG_OUTPUT("Capturing expression argument...\n");
+            DEBUG_OUTPUT("Capturing expression argument...");
             li = expr();               
             list_add_item(l, (void *)li);
             if(TOKEN != comma){                

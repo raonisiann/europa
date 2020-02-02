@@ -65,7 +65,6 @@ struct e_value *do_logical_equal(struct e_value *l, struct e_value *r){
     return res;
 }
 
-
 // Do the 'not equal' (!=) logic
 struct e_value *do_logical_not_equal(struct e_value *l, struct e_value *r){   
     struct e_value *res = factory_value(); 
