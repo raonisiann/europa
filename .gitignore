@@ -57,3 +57,4 @@ bin
 _test
 .gdb_history
 peda-session-europa.txt
+debug.txt
