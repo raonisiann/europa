@@ -61,6 +61,44 @@ struct reserved_word lex_reserved_words[10][7] = {
     }    
 };
 
+char lex_token_text[35][27] = {    
+    "new line",
+    "integer", 
+    "string",
+    "boolean", // 'true' or 'false'
+    "reference",
+    "plus", // +
+    "minus", // -
+    "multiply", // *
+    "division", // /
+    "assign", // = 
+    "negation", // !
+    "equal", // == 
+    "not equal", // not equal != 
+    "greater than", // greater than >
+    "less than", // less than <
+    "greater than or equal", // greater than or equal >=
+    "less than or equal", // less than or equal <=    
+    "'and' operator", // and operator 'and' 
+    "'or' operator", // or operator 'or'
+    "open curly braces", // open curly braces {
+    "close curly braces", // close curly braces }
+    "open square brackets", // open square brackets [
+    "close square brackets", // close square brackets ]
+    "open parenteses", // open parenteses (
+    "close parenteses", // close parenteses )
+    "colon", // colon : 
+    "comma",
+    "if statement",
+    "else statement", 
+    "while statement",
+    "def",
+    "include",
+    "function call",
+    "expression",
+    "return"
+};
+
 // Exactly match the "match"
 // with lex_cur_ch. 
 int lex_match(const char expected){        
@@ -375,6 +413,10 @@ void lex_clear_capture_buffer(char *buffer, unsigned int size){
     for(int i = 0; i < size; i++){
         buffer[i] = '\0';
     }
+}
+
+char *lex_token_to_text(int tk_class){
+    return lex_token_text[tk_class - 1];
 }
 
 // Initialize lexer settings

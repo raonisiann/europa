@@ -152,4 +152,6 @@ void lex_init();
 
 void lex_verbose(char *s, ...);
 
+char *lex_token_to_text(int tk_class);
+
 #endif

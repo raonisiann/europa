@@ -27,7 +27,7 @@ int parser_expect(int token){
     if(parser_accept(token)){
         return 1;
     }
-    parser_error_expected("Unexpected token '%s', should be -->>%i<<--\n", lex_tk->raw_value, token);
+    parser_error_expected("Unexpected %s '%s', should be an %s instead.\n", lex_token_to_text(lex_tk->class), lex_tk->raw_value, lex_token_to_text(token));
 }
 
 // 
