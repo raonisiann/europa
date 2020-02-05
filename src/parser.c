@@ -288,12 +288,12 @@ struct ast_node* factor(){
 // A list of references inside parenteses separated by comma
 // '(' a, b, c, var1, num, num2 ')'
 struct list *get_func_arg_symbols(){
+    parser_expect(oparenteses);
+    lex_next_token();
     struct list *func_arg_list = list_create();
     if(parser_accept(cparenteses)){
         DEBUG_OUTPUT("No references captured captured");                      
-    }else{
-        parser_expect(oparenteses);
-        lex_next_token();
+    }else{       
         struct ast_node *arg_item = NULL;        
         do{            
             DEBUG_OUTPUT("Capturing reference list...");
