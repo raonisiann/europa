@@ -71,6 +71,13 @@ void stmt_eval(struct e_stmt *stmt){
             while_stmt_eval(stmt->flow, NULL);
             break;        
 		break;
+        case s_return: 
+            // If the 'ret' reach the statement eval this point it should be             
+            // considered global utilization (out of function scope), which 
+            // is not supported at the moment. In future, this can be used 
+            // to handle program exit codes...              
+            EUROPA_ERROR("A return statement should be used only in function calls, not here... ");
+            break; 
         default:
             EUROPA_ERROR("Unable to evaluate statement of type '%i'\n", stmt->type);            
     }

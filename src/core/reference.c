@@ -56,6 +56,11 @@ struct e_value *function_eval(struct ast_node *fcall_node){
 		stmt_item = fdef->funcdef->body->first;
 		while(stmt_item != NULL) {
 			DEBUG_OUTPUT("EVALUATING STMT_BLOCK\n");
+			// A return ('ret') instruction was found... 
+			if(((struct e_stmt *)stmt_item->data)->type == s_return){
+				return expr_eval(((struct e_stmt *)stmt_item->data)->expr);
+				break; 	
+			}
 			stmt_eval((struct e_stmt *)stmt_item->data);
 			stmt_item = stmt_item->next;
 		}
