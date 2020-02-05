@@ -8,7 +8,8 @@ typedef enum {
     s_if_flow, 
     s_while_flow,
     s_assign, 
-    s_func_def
+    s_func_def, 
+    s_return 
 } stmt_type;
 
 struct e_stmt {
@@ -30,5 +31,6 @@ struct e_stmt *stmt_create_expr(struct ast_node *n);
 struct e_stmt *stmt_create_flow(unsigned int type, struct e_flow *flow);
 struct e_stmt *stmt_create_assign(struct ast_node *n);
 struct e_stmt *stmt_create_func_def(struct e_reference *func_def);
+struct e_stmt *stmt_create_return(struct ast_node *n);
 
 #endif

@@ -40,6 +40,13 @@ struct e_stmt *stmt_create_func_def(struct e_reference *func_def){
     return newstmt;    
 }
 
+struct e_stmt *stmt_create_return(struct ast_node *n){
+    struct e_stmt *newstmt = stmt_factory();
+    newstmt->type = s_return;	
+    newstmt->expr = n;    
+    return newstmt;    
+}
+
 
 void stmt_eval(struct e_stmt *stmt){    
     switch(stmt->type){

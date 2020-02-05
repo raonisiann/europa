@@ -118,6 +118,14 @@ struct e_stmt *stmt(){
         while_block = stmt_block();
         DEBUG_OUTPUT("END_WHILE"); 
         return stmt_create_flow(s_while_flow, flow_create(condition, while_block, NULL));      
+    }else if(parser_accept(returncmd)){
+        // so far 'ret' with empty expression is not supported...
+        // to use return you must to return something. 
+        // Return ('ret') is followed by an expression ('expr()')
+        // like 'ret 1', 'ret true', 'ret fcall() + 1' 
+        DEBUG_OUTPUT("RETURN");
+        lex_next_token();
+        return stmt_create_return(expr());
     }else{
     // EXPR, ASSINGMENT 
         DEBUG_OUTPUT("EXPR");
