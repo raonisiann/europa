@@ -28,6 +28,7 @@ struct reserved_word lex_reserved_words[10][7] = {
     // Size 3 comamnds
     {
         {"def", defcmd},
+        {"ref", returncmd},
         {NULL, undefined}
     },
     // Size 4 comamnds
