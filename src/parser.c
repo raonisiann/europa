@@ -258,8 +258,7 @@ struct ast_node* factor(){
         if(parser_accept(assign)){              
             return ast_add_assign_node(ref_tk, NULL);                       
         }else if(parser_accept(oparenteses)){            
-            DEBUG_OUTPUT("FUNCTION CALL STARTED");
-            lex_next_token();            
+            DEBUG_OUTPUT("FUNCTION CALL STARTED");            
             leaf = ast_add_fcall_node(ref_tk, expr_list());            
             parser_expect(cparenteses);
             DEBUG_OUTPUT("FUNCTION CALL ENDED");
@@ -315,7 +314,13 @@ struct list *get_func_arg_symbols(){
     return func_arg_list;
 }
 
+
+// Capture expression list.
+// A list of expressions (expr) inside parenteses separated by comma
+// '(' 11, funccall(), num, 1 + 2, false ')'
 struct list *expr_list(){
+    parser_expect(oparenteses);
+    lex_next_token();
     struct list *l = list_create();
     if(parser_accept(cparenteses)){
         DEBUG_OUTPUT("No arguments captured");        
@@ -332,6 +337,7 @@ struct list *expr_list(){
             lex_next_token();
         }while(1);  
     }  
+    parser_expect(cparenteses);
     return l;
 }
 
