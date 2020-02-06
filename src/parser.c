@@ -108,7 +108,7 @@ struct e_stmt *stmt(){
         if_block = stmt_block();
         parser_ignore_new_lines();
         if(parser_accept(elsecmd)){
-            printf("ELSE_BLOCK\n");
+            DEBUG_OUTPUT("ELSE_BLOCK");
             lex_next_token();
             else_block = stmt_block();
         }
