@@ -22,5 +22,6 @@ struct list *stmt_block();
 struct list *expr_list();
 struct list *get_func_arg_symbols();
 void func_def();
+void parser_ignore_new_lines();
 
 #endif

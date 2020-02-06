@@ -100,13 +100,19 @@ struct e_stmt *stmt(){
     else if (parser_accept(ifcmd)){   
         struct ast_node* condition = NULL;         
         struct list *if_block = NULL;
+        struct list *else_block = NULL;
         DEBUG_OUTPUT("IF");
         lex_next_token(); 
         condition = expr();
         DEBUG_OUTPUT("EXPR");
         if_block = stmt_block();
+        if(parser_accept(elsecmd)){
+            printf("ELSE_BLOCK\n");
+            lex_next_token();
+            else_block = stmt_block();
+        }
         DEBUG_OUTPUT("END_IF");
-        return stmt_create_flow(s_if_flow, flow_create(condition, if_block, NULL));
+        return stmt_create_flow(s_if_flow, flow_create(condition, if_block, else_block));
     // WHILE EXPR { BLOCK }
     }else if (parser_accept(whilecmd)){    
         struct ast_node* condition = NULL;         
