@@ -151,6 +151,16 @@ struct e_stmt *stmt(){
     }      
 }
 
+// Accept and ignore new lines 
+// Could be used to ignore sequences of 
+// new lines that are not part of the program... 
+void parser_ignore_new_lines(){
+    while(parser_accept(newline)){
+        DEBUG_OUTPUT("IGNORING_NEW_LINES");        
+        lex_next_token();        
+    }    
+}
+
 struct list *stmt_block(){
     DEBUG_OUTPUT("IF_BLOCK");
     struct list *stmt_list = list_create();
