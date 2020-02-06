@@ -33,13 +33,7 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node){
 	def_arg = fdef->funcdef->arg_list->first;
 	while(input_arg != NULL){		
 		DEBUG_OUTPUT("INPUT_ARG_EXPR_EVAL\n");
-		//input_value = expr_eval((struct ast_node *)input_arg->data);		
 		assignment_eval(((struct ast_node *)def_arg->data)->token, (struct ast_node *)input_arg->data);
-		//new_param_ref = new_reference(((struct ast_node *)def_arg->data)->token->raw_value, input_value);
-		//printf("SET_VALUE_REFERENCE\n");
-		//set_value_to_reference(new_param_ref, input_value);
-		//printf("SET_VALUE_REFERENCE\n");
-		//set_ht_reference(new_param_ref);
 		DEBUG_OUTPUT("NEXT_ITEM\n");
 		input_arg = input_arg->next;
 		def_arg = def_arg->next;
