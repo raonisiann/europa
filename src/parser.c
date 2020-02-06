@@ -106,6 +106,7 @@ struct e_stmt *stmt(){
         condition = expr();
         DEBUG_OUTPUT("EXPR");
         if_block = stmt_block();
+        parser_ignore_new_lines();
         if(parser_accept(elsecmd)){
             printf("ELSE_BLOCK\n");
             lex_next_token();
@@ -160,6 +161,7 @@ void parser_ignore_new_lines(){
         lex_next_token();        
     }    
 }
+
 
 struct list *stmt_block(){
     DEBUG_OUTPUT("IF_BLOCK");
