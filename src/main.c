@@ -4,8 +4,8 @@
 #include "hashtable.h"
 #include "europa_debug.h"
 #include "europa_error.h"
+#include "context.h"
 
-hashtable* symbols;
 extern FILE *LEX_INPUT;
 
 int main(int argc, char *argv[]){
@@ -13,9 +13,9 @@ int main(int argc, char *argv[]){
 // setting the default to stdin 
     char *input_file_name;
     LEX_INPUT = LEX_INPUT_DEFAULT;
-    // 
-    symbols = ht_init(100);
-   
+    // create the global context
+    GLOBAL_CTXT = context_create(100);
+       
     #ifdef DEBUG 
         europa_debug_init();
         DEBUG_OUTPUT("\n\nSTART DEBUG\n=================================\n")
