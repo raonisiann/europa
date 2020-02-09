@@ -35,6 +35,7 @@ e_bool is_bool_not_equal(int b1, int b2);
 
 
 void value_eval(struct e_value *data);
+void return_eval(struct ast_node *n, struct e_context *ctxt);
 struct e_value *expr_eval(struct ast_node *n, struct e_context *ctxt);
 
 #endif

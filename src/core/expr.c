@@ -9,6 +9,7 @@
 #include "reference.h"
 #include "europa_io.h"
 #include "europa_error.h"
+#include "stack.h"
 
 
 struct e_value *do_arithmetic_sum(struct e_value *l, struct e_value *r){
@@ -293,7 +294,7 @@ void value_eval(struct e_value *v){
                 EUROPA_OUTPUT("%s\n", v->str);
                 break;
             case e_int:                      
-                EUROPA_OUTPUT("%i\n", v->num);
+                EUROPA_OUTPUT("%i\n", v->num);                
                 break; 
             case e_boolean:                        
                 switch(v->boolean){
@@ -322,6 +323,16 @@ void value_eval(struct e_value *v){
     }	
 }
 
+
+// Evaluate the return context 
+// the result is pushed on the stack
+void return_eval(struct ast_node *n, struct e_context *ctxt){
+    struct e_value *ret_val = expr_eval(n, ctxt);
+    // push the return value onto stack
+    stack_push(ctxt->stack, (void *)ret_val);
+    // set the signal return, to stop all statement evaluation
+    ctxt->sig_ret = 1;        
+}
 
 
 struct e_value *expr_eval(struct ast_node *n, struct e_context *ctxt){
