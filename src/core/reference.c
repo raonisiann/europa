@@ -5,12 +5,11 @@
 #include "europa_error.h"
 #include "europa_debug.h"
 #include "statement.h"
+#include "context.h"
 
-extern hashtable* symbols;
-
-struct e_value *reference_eval(struct ast_node *ref_node){	
+struct e_value *reference_eval(struct ast_node *ref_node, struct e_context *ctxt){	
 	struct ht_entry *result = NULL;
-	result = ht_get(symbols, ref_node->token->raw_value);
+	result = ht_get(ctxt->symbols, ref_node->token->raw_value);
 	if(result){
 		DEBUG_OUTPUT("REFERENCE_FOUND");
 		return result->data->value;
@@ -33,7 +32,7 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node){
 	def_arg = fdef->funcdef->arg_list->first;
 	while(input_arg != NULL){		
 		DEBUG_OUTPUT("INPUT_ARG_EXPR_EVAL\n");
-		assignment_eval(((struct ast_node *)def_arg->data)->token, (struct ast_node *)input_arg->data);
+		assignment_eval(((struct ast_node *)def_arg->data)->token, (struct ast_node *)input_arg->data, fdef->funcdef->ctxt);
 		DEBUG_OUTPUT("NEXT_ITEM\n");
 		input_arg = input_arg->next;
 		def_arg = def_arg->next;
@@ -43,34 +42,34 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node){
 struct e_value *function_eval(struct ast_node *fcall_node){
 	struct e_reference *fdef = NULL;
 	// struct list_item *stmt_item = NULL;
-	fdef = get_ht_reference(fcall_node->fcall->func->raw_value);	
+	// function eval are placed on global table by default
+	fdef = get_ht_reference(fcall_node->fcall->func->raw_value, GLOBAL_CTXT);	
 	if(fdef){
 		DEBUG_OUTPUT("REFERENCE_FOUND\n");		
-		function_param_map(fdef, fcall_node);
-		// not considering context so far.. 
-		stmt_block_eval(fdef->funcdef->body, NULL);
+		function_param_map(fdef, fcall_node);	
+		stmt_block_eval(fdef->funcdef->body, fdef->funcdef->ctxt);
 	}else{
 		EUROPA_ERROR("Reference for function '%s' not found\n", fcall_node->fcall->func->raw_value);
 		return NULL;
 	}
 }
 
-void assignment_eval(struct lex_token *ref_tk, struct ast_node *e){
+void assignment_eval(struct lex_token *ref_tk, struct ast_node *e, struct e_context *ctxt){
 	// 
 	DEBUG_OUTPUT("NEW_REFERENCE '%s'\n", ref_tk->raw_value);	
 	struct e_reference *found_ref = NULL; 
-	found_ref = get_ht_reference(ref_tk->raw_value);
+	found_ref = get_ht_reference(ref_tk->raw_value, ctxt);
 	// new reference...
 	if(found_ref){	
 	// otherwise just a re-assign... 	
-		set_value_to_reference(found_ref, expr_eval(e));
+		set_value_to_reference(found_ref, expr_eval(e, ctxt));
 	}else{
 		DEBUG_OUTPUT("NEW_REFERENCE\n");
 		struct e_reference *new_ref = factory_reference();
 		new_ref->name = ref_tk->raw_value;
 		new_ref->type = e_reference;			
-		set_ht_reference(new_ref);
-		set_value_to_reference(new_ref, expr_eval(e));
+		set_ht_reference(new_ref, ctxt);
+		set_value_to_reference(new_ref, expr_eval(e, ctxt));
 	}
 	DEBUG_OUTPUT("DONE_ASSIGMENT\n");
 }

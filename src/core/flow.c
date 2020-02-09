@@ -13,7 +13,7 @@
 
 
 void if_stmt_eval(struct e_flow *flow, struct e_context *ctxt){   
-    struct e_value *condres = expr_eval(flow->cond); 
+    struct e_value *condres = expr_eval(flow->cond, ctxt); 
     if(condres->type != e_boolean){
         EUROPA_ERROR("If condition expression must to result in a boolean value");        
     }        
@@ -30,7 +30,7 @@ void if_stmt_eval(struct e_flow *flow, struct e_context *ctxt){
 
 
 void while_stmt_eval(struct e_flow *flow, struct e_context *ctxt){   
-    struct e_value *condres = expr_eval(flow->cond);    
+    struct e_value *condres = expr_eval(flow->cond, ctxt);    
     if(condres->type != e_boolean){
         EUROPA_ERROR("While expression must to result in a boolean value");        
     }      	
@@ -39,7 +39,7 @@ void while_stmt_eval(struct e_flow *flow, struct e_context *ctxt){
         while(condres->boolean == e_true){            			
 			DEBUG_OUTPUT("WHILE condition result TRUE\n");	            
             stmt_block_eval(flow->if_true, ctxt);
-            condres = expr_eval(flow->cond);        
+            condres = expr_eval(flow->cond, ctxt);        
         }
     }
 }

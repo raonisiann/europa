@@ -2,6 +2,7 @@
 #define I_EXPR_H
 
 #include "europa_types.h"
+#include "context.h"
 
 //bool get_bool_value(struct ast_node *n);
 char *get_string_value(struct ast_node *n);
@@ -34,6 +35,6 @@ e_bool is_bool_not_equal(int b1, int b2);
 
 
 void value_eval(struct e_value *data);
-struct e_value *expr_eval(struct ast_node *n);
+struct e_value *expr_eval(struct ast_node *n, struct e_context *ctxt);
 
 #endif

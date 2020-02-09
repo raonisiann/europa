@@ -324,15 +324,15 @@ void value_eval(struct e_value *v){
 
 
 
-struct e_value *expr_eval(struct ast_node *n){
+struct e_value *expr_eval(struct ast_node *n, struct e_context *ctxt){
     struct e_value *l;
     struct e_value *r;
 
     if(n->left != NULL){
-        l = expr_eval(n->left);           
+        l = expr_eval(n->left, ctxt);           
     }
     if(n->right != NULL){
-        r = expr_eval(n->right);        
+        r = expr_eval(n->right, ctxt);        
     }
 
     switch(n->type){
@@ -356,7 +356,7 @@ struct e_value *expr_eval(struct ast_node *n){
         case node_token:
             switch(n->token->class){       
                 case reference:                                         
-                    return reference_eval(n);                                    
+                    return reference_eval(n, ctxt);                                    
                 case andoper: // and
                     return do_logical_and(l, r);            
                 break;  

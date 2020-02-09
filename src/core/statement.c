@@ -48,27 +48,27 @@ struct e_stmt *stmt_create_return(struct ast_node *n){
 }
 
 
-void stmt_eval(struct e_stmt *stmt){    
+void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt){    
     switch(stmt->type){
         case s_assign: 
             // Assignment eval			 
             DEBUG_OUTPUT("ASSIGNMENT_EVAL\n");
-            assignment_eval(stmt->expr->assign->reference, stmt->expr->assign->expr);
+            assignment_eval(stmt->expr->assign->reference, stmt->expr->assign->expr, ctxt);
             break;
         case s_expr: 
             // Expression statement            	
             DEBUG_OUTPUT("EXPR_EVAL");
-            value_eval(expr_eval(stmt->expr));				            
+            value_eval(expr_eval(stmt->expr, ctxt));				            
             break;
         case s_if_flow: 
             // if statement eval
             DEBUG_OUTPUT("IF_EVAL");
-            if_stmt_eval(stmt->flow, NULL);
+            if_stmt_eval(stmt->flow, ctxt);
             break;
         case s_while_flow: 
             // While statement eval
             DEBUG_OUTPUT("WHILE_EVAL");
-            while_stmt_eval(stmt->flow, NULL);
+            while_stmt_eval(stmt->flow, ctxt);
             break;        
 		break;
         case s_return: 
@@ -91,7 +91,7 @@ void stmt_block_eval(struct list *stmt_list, struct e_context *ctxt){
     struct list_item *icmd;    
     icmd = stmt_list->first;            
     while(icmd != NULL){				
-        stmt_eval((struct e_stmt *)icmd->data);		
+        stmt_eval((struct e_stmt *)icmd->data, ctxt);		
         // ctxt->sig_ret == 1 ommited while context is not implemented. Avoiding segmentation faults...		
         if(((struct e_stmt *)icmd->data)->type == returncmd){           
             DEBUG_OUTPUT("RET inside BLOCK");

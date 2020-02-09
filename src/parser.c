@@ -63,7 +63,7 @@ void lang(){
             DEBUG_OUTPUT("EVALUATING STATEMENT");
             if(_stmt != NULL){
                 // eval statement....
-                stmt_eval(_stmt);
+                stmt_eval(_stmt, GLOBAL_CTXT);
             } 
             if(parser_accept(newline)){
                 lex_next_token();           
@@ -87,7 +87,7 @@ void func_def(){
     lex_next_token();    
     func_body = stmt_block();    
     // create and publish the reference to hashtable
-    set_ht_reference(new_fdef(ref_tk, arg_list, func_body));    
+    set_ht_reference(new_fdef(ref_tk, arg_list, func_body), GLOBAL_CTXT);    
 }
 
 struct e_stmt *stmt(){    
