@@ -35,6 +35,7 @@ struct reserved_word lex_reserved_words[10][7] = {
     {
         {"else", elsecmd},
         {"true", boolean},
+        {"null", nullval},
         {NULL, undefined}
     },
     // Size 5 comamnds
@@ -62,11 +63,12 @@ struct reserved_word lex_reserved_words[10][7] = {
     }    
 };
 
-char lex_token_text[35][27] = {    
+char lex_token_text[36][27] = {    
     "new line",
     "integer", 
     "string",
     "boolean", // 'true' or 'false'
+    "null", 
     "reference",
     "plus", // +
     "minus", // -

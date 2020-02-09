@@ -35,6 +35,7 @@ typedef enum {
     integer, 
     string,
     boolean, // 'true' or 'false'
+    nullval, // null value  
     reference,
     plus, // +
     minus, // -
