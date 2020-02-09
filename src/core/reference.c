@@ -49,21 +49,6 @@ struct e_value *function_eval(struct ast_node *fcall_node){
 		function_param_map(fdef, fcall_node);
 		// not considering context so far.. 
 		stmt_block_eval(fdef->funcdef->body, NULL);
-		/*
-		stmt_item = fdef->funcdef->body->first;
-		while(stmt_item != NULL) {
-			DEBUG_OUTPUT("EVALUATING STMT_BLOCK\n");
-			// A return ('ret') instruction was found... 
-			if(((struct e_stmt *)stmt_item->data)->type == s_return){
-				return expr_eval(((struct e_stmt *)stmt_item->data)->expr);
-				break; 	
-			}
-			stmt_eval((struct e_stmt *)stmt_item->data);
-			stmt_item = stmt_item->next;
-			
-		}
-		return NULL;
-		*/
 	}else{
 		EUROPA_ERROR("Reference for function '%s' not found\n", fcall_node->fcall->func->raw_value);
 		return NULL;
@@ -111,35 +96,3 @@ struct e_reference *get_ht_reference(char *name){
 void set_value_to_reference(struct e_reference *ref, struct e_value *v){	
 	ref->value = v; 
 }
-
-/*
-void create_reference(char *name, struct e_value *value){    
-	struct e_reference *ref = factory_reference();
-	ref->name = name; 
-	ref->type = e_reference;
-	ref->value = value;
-	ref->ht_hash = ht_key_calc(name);
-
-	ht_set(symbols, ref);
-	
-    if(d->ht_hash != 0){        
-        e = ht_get_by_hash(symbols, (char *)sym, d->ht_hash);
-    }else{
-        e = ht_get(symbols, (char *)sym);
-    }    
-	// the symbol is defined at the GLOBAL symbols	
-	if(e != NULL){		
-        ht_set(symbols, sym, d);		
-	}else{
-		// the symbol is not defined at the GLOBAL table
-		// and we have LOCAL context
-		if(c != NULL){			
-			ht_set(c->local_symbols, sym, d);			
-		}else{			
-			ht_set(symbols, sym, d);
-		}
-	}
-	
-}
-
-*/
