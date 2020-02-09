@@ -6,6 +6,7 @@
 #include "europa_std.h"
 #include "ast.h"
 #include "list.h"
+#include "context.h"
 
 typedef enum {
     e_false = '0',
@@ -61,6 +62,7 @@ struct e_assignment {
 struct e_func_def {
     struct list *arg_list; // list of... 
     struct list *body; // list of e_stmt 
+    struct e_context *ctxt; 
 };
 
 

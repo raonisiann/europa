@@ -4,6 +4,7 @@
 #include "europa_io.h"
 #include "europa_error.h"
 #include "memm.h"
+#include "context.h"
 
 
 struct e_value *factory_value(){
@@ -82,6 +83,8 @@ struct e_func_def *factory_fdef(){
     struct e_func_def *new_fdef = (struct e_func_def *)memm_alloc(sizeof(struct e_func_def));
     new_fdef->arg_list = NULL; 
     new_fdef->body = NULL;
+    // hardcoding hashtable size now... 
+    new_fdef->ctxt = context_create(15);
     return new_fdef;
 }
 
