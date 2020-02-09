@@ -42,11 +42,14 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node){
 
 struct e_value *function_eval(struct ast_node *fcall_node){
 	struct e_reference *fdef = NULL;
-	struct list_item *stmt_item = NULL;
+	// struct list_item *stmt_item = NULL;
 	fdef = get_ht_reference(fcall_node->fcall->func->raw_value);	
 	if(fdef){
 		DEBUG_OUTPUT("REFERENCE_FOUND\n");		
 		function_param_map(fdef, fcall_node);
+		// not considering context so far.. 
+		stmt_block_eval(fdef->funcdef->body, NULL);
+		/*
 		stmt_item = fdef->funcdef->body->first;
 		while(stmt_item != NULL) {
 			DEBUG_OUTPUT("EVALUATING STMT_BLOCK\n");
@@ -57,8 +60,10 @@ struct e_value *function_eval(struct ast_node *fcall_node){
 			}
 			stmt_eval((struct e_stmt *)stmt_item->data);
 			stmt_item = stmt_item->next;
+			
 		}
 		return NULL;
+		*/
 	}else{
 		EUROPA_ERROR("Reference for function '%s' not found\n", fcall_node->fcall->func->raw_value);
 		return NULL;

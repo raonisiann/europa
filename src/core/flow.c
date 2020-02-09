@@ -19,55 +19,26 @@ void if_stmt_eval(struct e_flow *flow, struct e_context *ctxt){
     }        
     if(condres->boolean == e_true){       
         if(flow->if_true->size > 0){
-            struct list_item *icmd = flow->if_true->first;            
-            while(icmd != NULL){
-                stmt_eval((struct e_stmt *)icmd->data);				
-				if(((struct e_stmt *)icmd->data)->type == returncmd || (ctxt != NULL && ctxt->sig_ret == 1)){
-					ctxt->sig_ret = 1; // set the return signal					
-					DEBUG_OUTPUT("ret_val inside the IF => %c", ctxt->ret_val->type);
-					break; 
-				}	
-				
-                icmd = icmd->next;
-            }
+            stmt_block_eval(flow->if_true, ctxt);
         }
     }else if(condres->boolean == e_false && flow->if_false != NULL){        
-        if(flow->if_false->size > 0){
-            struct list_item *icmd = flow->if_false->first;            
-            while(icmd != NULL){
-                stmt_eval((struct e_stmt *)icmd->data);				
-				if(((struct e_stmt *)icmd->data)->type == returncmd || (ctxt != NULL && ctxt->sig_ret == 1)){
-					ctxt->sig_ret = 1; // set the return signal					
-					DEBUG_OUTPUT("ret_val inside the ELSE => %c", ctxt->ret_val->type);
-					break; 
-				}								
-                icmd = icmd->next;
-            }
+        if(flow->if_false->size > 0){            
+            stmt_block_eval(flow->if_false, ctxt);                                 
         }        
     }
 }
 
 
 void while_stmt_eval(struct e_flow *flow, struct e_context *ctxt){   
-    struct e_value *condres = expr_eval(flow->cond);
-    struct list_item *icmd;
+    struct e_value *condres = expr_eval(flow->cond);    
     if(condres->type != e_boolean){
         EUROPA_ERROR("While expression must to result in a boolean value");        
     }      	
     if(flow->if_true->size > 0){
 		DEBUG_OUTPUT("WHILE if TRUE branch greater than zero");
         while(condres->boolean == e_true){            			
-			DEBUG_OUTPUT("WHILE condition result TRUE\n");	
-            icmd = flow->if_true->first;            
-            while(icmd != NULL){				
-                stmt_eval((struct e_stmt *)icmd->data);				
-				if(((struct e_stmt *)icmd->data)->type == returncmd || (ctxt != NULL && ctxt->sig_ret == 1)){
-					ctxt->sig_ret = 1; // set the return signal					
-					DEBUG_OUTPUT("retval inside the WHILE => %c", ctxt->ret_val->type);
-					break; 
-				}									
-                icmd = icmd->next;
-            }                                    
+			DEBUG_OUTPUT("WHILE condition result TRUE\n");	            
+            stmt_block_eval(flow->if_true, ctxt);
             condres = expr_eval(flow->cond);        
         }
     }
