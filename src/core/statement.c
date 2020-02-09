@@ -4,6 +4,7 @@
 #include "expr.h"
 #include "reference.h"
 #include "flow.h"
+#include "context.h"
 #include "europa_debug.h"
 #include "europa_error.h"
 
@@ -48,7 +49,7 @@ struct e_stmt *stmt_create_return(struct ast_node *n){
 }
 
 
-void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt){    
+void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt){        
     switch(stmt->type){
         case s_assign: 
             // Assignment eval			 
@@ -69,14 +70,9 @@ void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt){
             // While statement eval
             DEBUG_OUTPUT("WHILE_EVAL");
             while_stmt_eval(stmt->flow, ctxt);
-            break;        
-		break;
-        case s_return: 
-            // If the 'ret' reach the statement eval this point it should be             
-            // considered global utilization (out of function scope), which 
-            // is not supported at the moment. In future, this can be used 
-            // to handle program exit codes...              
-            EUROPA_ERROR("A return statement should be used only in function calls, not here... ");
+            break;        		
+        case s_return:                         
+            return_eval(stmt->expr, ctxt);
             break; 
         default:
             EUROPA_ERROR("Unable to evaluate statement of type '%i'\n", stmt->type);            
@@ -91,9 +87,8 @@ void stmt_block_eval(struct list *stmt_list, struct e_context *ctxt){
     struct list_item *icmd;    
     icmd = stmt_list->first;            
     while(icmd != NULL){				
-        stmt_eval((struct e_stmt *)icmd->data, ctxt);		
-        // ctxt->sig_ret == 1 ommited while context is not implemented. Avoiding segmentation faults...		
-        if(((struct e_stmt *)icmd->data)->type == returncmd){           
+        stmt_eval((struct e_stmt *)icmd->data, ctxt);		        
+        if(((struct e_stmt *)icmd->data)->type == returncmd || ctxt->sig_ret == 1){           
             DEBUG_OUTPUT("RET inside BLOCK");
             break; 
         }									

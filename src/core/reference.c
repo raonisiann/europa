@@ -6,6 +6,7 @@
 #include "europa_debug.h"
 #include "statement.h"
 #include "context.h"
+#include "stack.h"
 
 struct e_value *reference_eval(struct ast_node *ref_node, struct e_context *ctxt){	
 	struct ht_entry *result = NULL;
@@ -41,16 +42,18 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node){
 
 struct e_value *function_eval(struct ast_node *fcall_node){
 	struct e_reference *fdef = NULL;
-	// struct list_item *stmt_item = NULL;
+	struct e_value *ret_val = NULL; 
 	// function eval are placed on global table by default
 	fdef = get_ht_reference(fcall_node->fcall->func->raw_value, GLOBAL_CTXT);	
 	if(fdef){
 		DEBUG_OUTPUT("REFERENCE_FOUND\n");		
 		function_param_map(fdef, fcall_node);	
-		stmt_block_eval(fdef->funcdef->body, fdef->funcdef->ctxt);
+		stmt_block_eval(fdef->funcdef->body, fdef->funcdef->ctxt);		
+		ret_val = (struct e_value *)stack_pop(fdef->funcdef->ctxt->stack);
+		return ret_val;
 	}else{
 		EUROPA_ERROR("Reference for function '%s' not found\n", fcall_node->fcall->func->raw_value);
-		return NULL;
+		return ret_val;
 	}
 }
 
