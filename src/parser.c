@@ -59,14 +59,15 @@ void lang(){
             //lex_next_token();
         }else{
             struct e_stmt *_stmt = NULL;
-            _stmt = stmt();            
-            parser_expect(newline);               
+            _stmt = stmt();                        
             DEBUG_OUTPUT("EVALUATING STATEMENT");
             if(_stmt != NULL){
                 // eval statement....
                 stmt_eval(_stmt);
-            }            
-            lex_next_token();           
+            } 
+            if(parser_accept(newline)){
+                lex_next_token();           
+            }                      
         } 
                       
     }    
