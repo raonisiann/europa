@@ -76,15 +76,36 @@ void assignment_eval(struct lex_token *ref_tk, struct ast_node *e){
 }
 
 // create an entry on the hashtable for reference 
-void set_ht_reference(struct e_reference *ref){
+//
+// A reference is always created on the local context if exists 
+// otherwise, it is placed on the global 
+void set_ht_reference(struct e_reference *ref, struct e_context *ctxt){
 	ref->ht_hash = ht_key_calc(ref->name);
-	ht_set(symbols, ref);	
+	if(ctxt != NULL){
+		ht_set(ctxt->symbols, ref);
+	}else{
+		ht_set(GLOBAL_CTXT->symbols, ref);
+	}			
 }
 
+
 // return an reference from the hashtable
-struct e_reference *get_ht_reference(char *name){
+//
+// Resolution order: 
+// 1. 	Look at the local context at 'ctxt' if defined
+// 2.	If found on local, return the value
+// 3. 	If not found on local, look at the global context
+// 4.	If not found on global, neither local, return NULL	
+struct e_reference *get_ht_reference(char *name, struct e_context *ctxt){	
 	struct ht_entry *find_ref = NULL;
-	find_ref = ht_get(symbols, name);	
+	if(ctxt != NULL){
+		find_ref = ht_get(ctxt->symbols, name);		
+		if(find_ref != NULL){
+			return find_ref->data;
+		}		
+	}
+	// look at global 
+	find_ref = ht_get(GLOBAL_CTXT->symbols, name);	
 	if(find_ref != NULL){
 		return find_ref->data;
 	}else{
