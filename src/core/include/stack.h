@@ -15,10 +15,9 @@ typedef struct europa_stack {
 } e_stack;
 
 e_stack *stack_init(unsigned int stk_size);
-e_stack_i *stack_pop(e_stack *stk);
-e_stack_i *stack_peek(e_stack *stk);
-void stack_push(e_stack *stk, e_stack_i *item);
+void *stack_pop(e_stack *stk);
+void *stack_peek(e_stack *stk);
+void stack_push(e_stack *stk, void *data);
 void stack_destroy(e_stack *stk);
-
 
 #endif 
