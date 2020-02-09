@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "stack.h"
 #include "europa_error.h"
+#include "memm.h"
 
 // Create and stack of the size 'stk_size' 
 // Returns the pointer to the new created stack 'e_stack'
