@@ -26,25 +26,25 @@ e_stack *stack_init(unsigned int stk_size){
 // Returns an item from the stack
 // decrement the stk->top and increment 
 // the stk->free counters... 
-e_stack_i *stack_pop(e_stack *stk){
+void *stack_pop(e_stack *stk){
 
-    if(stk->top == STACK_OUT_INDEX){
+    if(stk->top == STACK_OUT_INDEX){        
         return NULL;
     }
     e_stack_i *item = &stk->table[stk->top];
     stk->top = stk->top - 1;
     stk->free = stk->free + 1;
-    return item; 
+    return item->data; 
 }
 
 
 // Return an item from top without remove it
-e_stack_i *stack_peek(e_stack *stk){
+void *stack_peek(e_stack *stk){
 
     if(stk->top == STACK_OUT_INDEX){
         return NULL;
     }
-    return &stk->table[stk->top];
+    return (&stk->table[stk->top])->data;
 }
 
 
@@ -52,13 +52,17 @@ e_stack_i *stack_peek(e_stack *stk){
 // Pushing an item to a full stack will cause 
 // an error and program will terminate. 
 // So, measure your stack before start pushing items
-void stack_push(e_stack *stk, e_stack_i *item){
+void stack_push(e_stack *stk, void *data){    
+    e_stack_i *item;
+    unsigned int new_top; 
 
     if(stk->free == 0){
         EUROPA_ERROR("Stack full");        
     }
-    unsigned int new_top = stk->top + 1;
-    stk->table[new_top];
+    
+    new_top = stk->top + 1;
+    item = &stk->table[new_top];
+    item->data = data;
     stk->free = stk->free -1;
     stk->top = new_top;
 }
