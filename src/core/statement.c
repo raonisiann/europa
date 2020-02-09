@@ -82,3 +82,21 @@ void stmt_eval(struct e_stmt *stmt){
             EUROPA_ERROR("Unable to evaluate statement of type '%i'\n", stmt->type);            
     }
 }
+
+// Eval the list of statements
+// The evaluation will break if the 'ret' (return) is found 
+// or a return signal was sent from an inner statement block, which 
+// means the outer blocks must to stop processing... 
+void stmt_block_eval(struct list *stmt_list, struct e_context *ctxt){
+    struct list_item *icmd;    
+    icmd = stmt_list->first;            
+    while(icmd != NULL){				
+        stmt_eval((struct e_stmt *)icmd->data);		
+        // ctxt->sig_ret == 1 ommited while context is not implemented. Avoiding segmentation faults...		
+        if(((struct e_stmt *)icmd->data)->type == returncmd){           
+            DEBUG_OUTPUT("RET inside BLOCK");
+            break; 
+        }									
+        icmd = icmd->next;
+    }      
+}
