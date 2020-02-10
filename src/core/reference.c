@@ -9,11 +9,11 @@
 #include "stack.h"
 
 struct e_value *reference_eval(struct ast_node *ref_node, struct e_context *ctxt){	
-	struct ht_entry *result = NULL;
-	result = ht_get(ctxt->symbols, ref_node->token->raw_value);
+	struct e_reference *result = NULL;
+	result = get_ht_reference(ref_node->token->raw_value, ctxt);
 	if(result){
 		DEBUG_OUTPUT("REFERENCE_FOUND");
-		return result->data->value;
+		return result->value;
 	}else{
 		EUROPA_ERROR("Reference '%s' not found", ref_node->token->raw_value);
 		return NULL;
@@ -84,8 +84,10 @@ void assignment_eval(struct lex_token *ref_tk, struct ast_node *e, struct e_cont
 void set_ht_reference(struct e_reference *ref, struct e_context *ctxt){
 	ref->ht_hash = ht_key_calc(ref->name);
 	if(ctxt != NULL){
+		DEBUG_OUTPUT("NEW_LOCAL_REFERENCE");
 		ht_set(ctxt->symbols, ref);
 	}else{
+		DEBUG_OUTPUT("NEW_GLOBAL_REFERENCE");
 		ht_set(GLOBAL_CTXT->symbols, ref);
 	}			
 }
@@ -101,16 +103,21 @@ void set_ht_reference(struct e_reference *ref, struct e_context *ctxt){
 struct e_reference *get_ht_reference(char *name, struct e_context *ctxt){	
 	struct ht_entry *find_ref = NULL;
 	if(ctxt != NULL){
+		DEBUG_OUTPUT("LOOKING_LOCAL_CONTEXT");
 		find_ref = ht_get(ctxt->symbols, name);		
 		if(find_ref != NULL){
+			DEBUG_OUTPUT("FOUND_AT_LOCAL_CONTEXT");
 			return find_ref->data;
 		}		
 	}
+	DEBUG_OUTPUT("LOOKING_GLOBAL_LOCAL_CONTEXT");
 	// look at global 
 	find_ref = ht_get(GLOBAL_CTXT->symbols, name);	
 	if(find_ref != NULL){
+		DEBUG_OUTPUT("FOUND_AT_GLOBAL_LOCAL_CONTEXT");
 		return find_ref->data;
 	}else{
+		DEBUG_OUTPUT("REFERENCE_NOT_FOUND");
 		return NULL;
 	}
 }
