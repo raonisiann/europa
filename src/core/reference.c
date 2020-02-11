@@ -11,8 +11,7 @@
 struct e_value *reference_eval(struct ast_node *ref_node, struct e_context *ctxt){	
 	struct e_reference *result = NULL;
 	result = get_ht_reference(ref_node->token->raw_value, ctxt);
-	if(result){
-		DEBUG_OUTPUT("REFERENCE_FOUND");
+	if(result){	
 		return result->value;
 	}else{
 		EUROPA_ERROR("Reference '%s' not found", ref_node->token->raw_value);
@@ -115,7 +114,7 @@ struct e_reference *get_ht_reference(char *name, struct e_context *ctxt){
 		DEBUG_OUTPUT("LOOKING_LOCAL_CONTEXT");
 		find_ref = ht_get(ctxt->symbols, name);		
 		if(find_ref != NULL){
-			DEBUG_OUTPUT("FOUND_AT_LOCAL_CONTEXT");
+			DEBUG_OUTPUT("FOUND_AT_LOCAL_CONTEXT -> %s", name);
 			return find_ref->data;
 		}		
 	}
@@ -123,7 +122,7 @@ struct e_reference *get_ht_reference(char *name, struct e_context *ctxt){
 	// look at global 
 	find_ref = ht_get(GLOBAL_CTXT->symbols, name);	
 	if(find_ref != NULL){
-		DEBUG_OUTPUT("FOUND_AT_GLOBAL_LOCAL_CONTEXT");
+		DEBUG_OUTPUT("FOUND_AT_GLOBAL_LOCAL_CONTEXT -> %s", name);
 		return find_ref->data;
 	}else{
 		DEBUG_OUTPUT("REFERENCE_NOT_FOUND");
