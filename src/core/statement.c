@@ -49,17 +49,20 @@ struct e_stmt *stmt_create_return(struct ast_node *n){
 }
 
 
-void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt){        
+void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt){  
+    struct e_value *expr_value = NULL;      
     switch(stmt->type){
         case s_assign: 
             // Assignment eval			 
             DEBUG_OUTPUT("ASSIGNMENT_EVAL\n");
-            assignment_eval(stmt->expr->assign->reference, stmt->expr->assign->expr, ctxt);
+            expr_value = expr_eval(stmt->expr->assign->expr, ctxt);
+            assignment_eval(stmt->expr->assign->reference, expr_value, ctxt);
             break;
         case s_expr: 
             // Expression statement            	
             DEBUG_OUTPUT("EXPR_EVAL");
-            value_eval(expr_eval(stmt->expr, ctxt));				            
+            expr_value = expr_eval(stmt->expr, ctxt);
+            value_eval(expr_value);				            
             break;
         case s_if_flow: 
             // if statement eval
