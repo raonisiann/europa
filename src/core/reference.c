@@ -20,10 +20,16 @@ struct e_value *reference_eval(struct ast_node *ref_node, struct e_context *ctxt
 	}
 }
 
-void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node){
+// function call param map should evaluate
+// input variables (params) in the current context
+// then create new ones in the new context.
+// 'cur_context' (current) and 'new_context' can
+// be the same if function is being called in 
+// global context, or different is the call is 
+// made from another function 
+void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node, struct e_context *cur_ctxt, struct e_context *new_ctxt){
 	struct list_item *input_arg = NULL, *def_arg = NULL;	
 	struct e_value *input_value = NULL;
-	struct e_reference *new_param_ref = NULL;
 	
 	if(fdef->funcdef->arg_list->size != fcall_node->fcall->expr_list->size){
 		EUROPA_ERROR("Wrong number of parameters for function '%s', is expecting %i, but you provided %i\n", fcall_node->token->raw_value, fdef->funcdef->arg_list->size, fcall_node->fcall->expr_list->size);
@@ -32,9 +38,10 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node){
 	input_arg = fcall_node->fcall->expr_list->first;
 	def_arg = fdef->funcdef->arg_list->first;
 	while(input_arg != NULL){		
-		DEBUG_OUTPUT("INPUT_ARG_EXPR_EVAL\n");
-		assignment_eval(((struct ast_node *)def_arg->data)->token, (struct ast_node *)input_arg->data, fdef->funcdef->ctxt);
-		DEBUG_OUTPUT("NEXT_ITEM\n");
+		DEBUG_OUTPUT("INPUT_ARG_EXPR_EVAL");
+		input_value = expr_eval((struct ast_node *)input_arg->data, cur_ctxt);
+		assignment_eval(((struct ast_node *)def_arg->data)->token, input_value, new_ctxt);
+		DEBUG_OUTPUT("NEXT_ITEM");
 		input_arg = input_arg->next;
 		def_arg = def_arg->next;
 	}
