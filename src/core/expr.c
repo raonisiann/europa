@@ -363,7 +363,7 @@ struct e_value *expr_eval(struct ast_node *n, struct e_context *ctxt){
 
         // tokens.. 
         case node_reference:   
-            return function_eval(n);         
+            return function_eval(n, ctxt);         
         case node_token:
             switch(n->token->class){       
                 case reference:                                         
