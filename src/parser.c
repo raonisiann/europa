@@ -44,23 +44,18 @@ void parser_error_expected(char *s, ...){
 //
 void lang(){        
     while(1){        
-        if(parser_accept(newline)){
-            DEBUG_OUTPUT("Captured -> new line");                         
+        if(parser_accept(newline)){            
             lex_next_token();                                         
         }else if(parser_accept(eof)){
-            DEBUG_OUTPUT("Captured -> End of file");   
+            DEBUG_OUTPUT("END_OF_FILE");   
             break;
         }else if(parser_accept(defcmd)){     
             // function definition
-            // def FUNC_NAME '(' FUNC_ARGS ')' '{' FUNC_BODY '}'  
-            DEBUG_OUTPUT("STARTING FUNCTION_DEFINITION");                      
-            func_def();
-            DEBUG_OUTPUT("ENDING FUNCTION_DEFINITION");
-            //lex_next_token();
+            // def FUNC_NAME '(' FUNC_ARGS ')' '{' FUNC_BODY '}'              
+            func_def();            
         }else{
             struct e_stmt *_stmt = NULL;
-            _stmt = stmt();                        
-            DEBUG_OUTPUT("EVALUATING STATEMENT");
+            _stmt = stmt();                                    
             if(_stmt != NULL){
                 // eval statement....
                 stmt_eval(_stmt, GLOBAL_CTXT);
@@ -92,8 +87,7 @@ void func_def(){
 
 struct e_stmt *stmt(){    
     // NEW_LINE
-    if(parser_accept(newline)){
-        DEBUG_OUTPUT("new line for a statement");            
+    if(parser_accept(newline)){        
         lex_next_token(); 
         return NULL;
     }
@@ -102,45 +96,35 @@ struct e_stmt *stmt(){
         struct ast_node* condition = NULL;         
         struct list *if_block = NULL;
         struct list *else_block = NULL;
-        DEBUG_OUTPUT("IF");
         lex_next_token(); 
-        condition = expr();
-        DEBUG_OUTPUT("EXPR");
+        condition = expr();        
         if_block = stmt_block();
         parser_ignore_new_lines();
-        if(parser_accept(elsecmd)){
-            DEBUG_OUTPUT("ELSE_BLOCK");
+        if(parser_accept(elsecmd)){            
             lex_next_token();
             else_block = stmt_block();
-        }
-        DEBUG_OUTPUT("END_IF");
+        }        
         return stmt_create_flow(s_if_flow, flow_create(condition, if_block, else_block));
     // WHILE EXPR { BLOCK }
     }else if (parser_accept(whilecmd)){    
         struct ast_node* condition = NULL;         
         struct list *while_block = NULL;                
-        DEBUG_OUTPUT("WHILE");
         lex_next_token(); 
-        condition = expr();
-        DEBUG_OUTPUT("EXPR");
-        while_block = stmt_block();
-        DEBUG_OUTPUT("END_WHILE"); 
+        condition = expr();        
+        while_block = stmt_block();        
         return stmt_create_flow(s_while_flow, flow_create(condition, while_block, NULL));      
     }else if(parser_accept(returncmd)){
         // so far 'ret' with empty expression is not supported...
         // to use return you must to return something. 
         // Return ('ret') is followed by an expression ('expr()')
-        // like 'ret 1', 'ret true', 'ret fcall() + 1' 
-        DEBUG_OUTPUT("RETURN");
+        // like 'ret 1', 'ret true', 'ret fcall() + 1'         
         lex_next_token();
         return stmt_create_return(expr());
     }else{
-    // EXPR, ASSINGMENT 
-        DEBUG_OUTPUT("EXPR");
+    // EXPR, ASSINGMENT        
         struct ast_node* _expr = NULL;
         _expr = expr();         
-        if(parser_accept(assign)){                       
-            DEBUG_OUTPUT("ASSIGNMENT");             
+        if(parser_accept(assign)){                                   
             lex_next_token(); 
             if(_expr->type != node_assign){
                 EUROPA_ERROR("An assign must use be of type 'reference'");
@@ -157,23 +141,19 @@ struct e_stmt *stmt(){
 // Could be used to ignore sequences of 
 // new lines that are not part of the program... 
 void parser_ignore_new_lines(){
-    while(parser_accept(newline)){
-        DEBUG_OUTPUT("IGNORING_NEW_LINES");        
+    while(parser_accept(newline)){        
         lex_next_token();        
     }    
 }
 
 
-struct list *stmt_block(){
-    DEBUG_OUTPUT("IF_BLOCK");
+struct list *stmt_block(){    
     struct list *stmt_list = list_create();
-    while(TOKEN == newline){
-        DEBUG_OUTPUT("Ignoring empty new lines");
+    while(TOKEN == newline){        
         parser_expect(newline);
         lex_next_token();        
     }
-    if(parser_accept(ocurlybrc)){
-        DEBUG_OUTPUT("OPEN_CURLY_BRACES");
+    if(parser_accept(ocurlybrc)){       
         struct e_stmt *stmt_item = NULL;
         lex_next_token();           
         while(TOKEN != ccurlybrc){
@@ -182,11 +162,9 @@ struct list *stmt_block(){
                 list_add_item(stmt_list, (void *)stmt_item);
             }                     
         }
-        parser_expect(ccurlybrc);
-        DEBUG_OUTPUT("CLOSE_CURLY_BRACES");
+        parser_expect(ccurlybrc);        
         lex_next_token();        
-    }else{
-        DEBUG_OUTPUT("Something else");      
+    }else{        
     } 
     return stmt_list;
 }
@@ -266,42 +244,36 @@ struct ast_node* term(){
 struct ast_node* factor(){   
     struct ast_node* leaf = NULL;   
     if(parser_accept(integer)){
-        DEBUG_OUTPUT("Captured -> digit (%i) %s", lex_tk->size, lex_tk->raw_value);                 
+        DEBUG_OUTPUT("FACTOR -> DIGIT (%i) %s", lex_tk->size, lex_tk->raw_value);                 
         leaf = ast_add_value_node(token_to_integer(lex_tk),  NULL, NULL);
         lex_next_token();        
     }else if(parser_accept(string)){
-        DEBUG_OUTPUT("Captured -> STRING (%i) %s", lex_tk->size, lex_tk->raw_value);     
+        DEBUG_OUTPUT("FACTOR -> STRING (%i) %s", lex_tk->size, lex_tk->raw_value);     
         leaf = ast_add_value_node(token_to_string(lex_tk),  NULL, NULL);           
         lex_next_token();
     }else if(parser_accept(boolean)){
-        DEBUG_OUTPUT("Captured -> BOOLEAN (%i) %s", lex_tk->size, lex_tk->raw_value);               
+        DEBUG_OUTPUT("FACTOR -> BOOLEAN (%i) %s", lex_tk->size, lex_tk->raw_value);               
         leaf = ast_add_value_node(token_to_boolean(lex_tk),  NULL, NULL); 
         lex_next_token();        
-    }else if(parser_accept(reference)){    
-        DEBUG_OUTPUT("REFERENCE");
+    }else if(parser_accept(reference)){            
         struct lex_token *ref_tk = lex_tk;         
         lex_next_token();      
         // if is an assigment return immediately to statement function
         if(parser_accept(assign)){              
             return ast_add_assign_node(ref_tk, NULL);                       
-        }else if(parser_accept(oparenteses)){            
-            DEBUG_OUTPUT("FUNCTION CALL STARTED");            
+        }else if(parser_accept(oparenteses)){                        
             leaf = ast_add_fcall_node(ref_tk, expr_list());            
             parser_expect(cparenteses);
-            DEBUG_OUTPUT("FUNCTION CALL ENDED");
             lex_next_token();                        
         }else{
             leaf = ast_add_token_node(ref_tk, NULL, NULL);    
         }
-    }else if(parser_accept(oparenteses)){
-        DEBUG_OUTPUT("OPEN_PARENTESES");
+    }else if(parser_accept(oparenteses)){        
         lex_next_token();
         leaf = expr();
         parser_expect(cparenteses);
-        DEBUG_OUTPUT("CLOSE_PARENTESES");
         lex_next_token();
-    }else if(parser_accept(osqbrackets)){
-        DEBUG_OUTPUT("OPEN_SQUARE_BRACKETS");
+    }else if(parser_accept(osqbrackets)){        
         lex_next_token();
     }else{
         DEBUG_OUTPUT("Syntax error: Cannot be -->> %s <<-- here", lex_tk->raw_value);
@@ -321,8 +293,7 @@ struct list *get_func_arg_symbols(){
         DEBUG_OUTPUT("No references captured captured");                      
     }else{       
         struct ast_node *arg_item = NULL;        
-        do{            
-            DEBUG_OUTPUT("Capturing reference list...");
+        do{                    
             parser_expect(reference);
             // TODO: 
             // no need for ast here... ?
@@ -336,8 +307,7 @@ struct list *get_func_arg_symbols(){
             lex_next_token();
         }while(1);      
     }  
-    parser_expect(cparenteses);
-    DEBUG_OUTPUT("MATCHING CLOSE_PARENTESES");
+    parser_expect(cparenteses);    
     return func_arg_list;
 }
 
@@ -349,12 +319,10 @@ struct list *expr_list(){
     parser_expect(oparenteses);
     lex_next_token();
     struct list *l = list_create();
-    if(parser_accept(cparenteses)){
-        DEBUG_OUTPUT("No arguments captured");        
+    if(parser_accept(cparenteses)){        
     }else{              
         struct ast_node *li = NULL;
-        do{            
-            DEBUG_OUTPUT("Capturing expression argument...");
+        do{                        
             li = expr();               
             list_add_item(l, (void *)li);
             if(TOKEN != comma){                
