@@ -57,24 +57,25 @@ struct e_value *function_eval(struct ast_node *fcall_node){
 	}
 }
 
-void assignment_eval(struct lex_token *ref_tk, struct ast_node *e, struct e_context *ctxt){
+void assignment_eval(struct lex_token *ref_tk, struct e_value *v, struct e_context *ctxt){
 	// 
-	DEBUG_OUTPUT("NEW_REFERENCE '%s'\n", ref_tk->raw_value);	
+	DEBUG_OUTPUT("ASSIGNMENT_EVAL -> '%s'", ref_tk->raw_value);	
 	struct e_reference *found_ref = NULL; 
 	found_ref = get_ht_reference(ref_tk->raw_value, ctxt);
 	// new reference...
 	if(found_ref){	
-	// otherwise just a re-assign... 	
-		set_value_to_reference(found_ref, expr_eval(e, ctxt));
+	// otherwise just a re-assign... 
+		DEBUG_OUTPUT("REASSIGN");
+		found_ref->value = v;
 	}else{
-		DEBUG_OUTPUT("NEW_REFERENCE\n");
+		DEBUG_OUTPUT("NEW_REFERENCE");
 		struct e_reference *new_ref = factory_reference();
 		new_ref->name = ref_tk->raw_value;
-		new_ref->type = e_reference;			
+		new_ref->type = e_reference;	
+		new_ref->value = v;		
 		set_ht_reference(new_ref, ctxt);
-		set_value_to_reference(new_ref, expr_eval(e, ctxt));
-	}
-	DEBUG_OUTPUT("DONE_ASSIGMENT\n");
+	}	
+	DEBUG_OUTPUT("DONE_ASSIGMENT");
 }
 
 // create an entry on the hashtable for reference 
