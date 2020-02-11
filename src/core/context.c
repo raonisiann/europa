@@ -12,3 +12,14 @@ struct e_context *context_create(unsigned int sym_init_size){
     new_ctxt->sig_ret = 0;
     return new_ctxt;
 }
+
+// Destroy an created context
+void context_destroy(struct e_context *ctxt){
+    // destroy the hashtable with the references
+    // the values are not destroyed 
+    ht_destroy(ctxt->symbols);
+    // remove the references and signals
+    ctxt->ret_val = NULL; 
+    ctxt->sig_ret = 0;
+    memm_free(ctxt);
+}

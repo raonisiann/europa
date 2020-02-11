@@ -14,6 +14,7 @@ struct e_context {
 };
 
 struct e_context *context_create(unsigned int sym_init_size);
+void context_destroy(struct e_context *ctxt);
 
 // hold the global symbols. Local context are created dynamically 
 // on function calls
