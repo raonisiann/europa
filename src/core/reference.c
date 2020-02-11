@@ -50,6 +50,7 @@ struct e_value *function_eval(struct ast_node *fcall_node, struct e_context *ctx
 	DEBUG_OUTPUT("FUNC_EVAL_STARTING");
 	struct e_reference *fdef = NULL;	
 	struct e_context *fcall_ctxt = NULL; 
+	struct e_value *ret_value = NULL;
 	// function eval are placed on global table by default
 	fdef = get_ht_reference(fcall_node->fcall->func->raw_value, GLOBAL_CTXT);	
 	if(fdef){					
@@ -57,10 +58,12 @@ struct e_value *function_eval(struct ast_node *fcall_node, struct e_context *ctx
 		function_param_map(fdef, fcall_node, ctxt, fcall_ctxt);			
 		stmt_block_eval(fdef->funcdef->body, fcall_ctxt);				
 		DEBUG_OUTPUT("FUNC_EVAL_END");
-		return fcall_ctxt->ret_val;
+		ret_value = fcall_ctxt->ret_val;
+		context_destroy(fcall_ctxt);
+		return ret_value; 
 	}else{
 		EUROPA_ERROR("Reference for function '%s' not found\n", fcall_node->fcall->func->raw_value);
-		return NULL;
+		return ret_value;
 	}
 }
 
