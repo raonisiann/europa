@@ -26,7 +26,7 @@ struct e_value *do_arithmetic_sum(struct e_value *l, struct e_value *r){
     return res;
 }
 
-struct e_value *do_arithmetic_subtract(struct e_value *l, struct e_value *r){
+struct e_value *do_arithmetic_subtract(struct e_value *l, struct e_value *r){   
     struct e_value *res = factory_value();
     res->num = l->num - r->num;
     res->type = e_int;
@@ -328,8 +328,9 @@ void value_eval(struct e_value *v){
 // the result is pushed on the stack
 void return_eval(struct ast_node *n, struct e_context *ctxt){
     struct e_value *ret_val = expr_eval(n, ctxt);
-    // push the return value onto stack
-    stack_push(ctxt->stack, (void *)ret_val);
+    // push the return value into context... 
+    // !!!! This should be copied before the context get destroyed !!!!
+    ctxt->ret_val = ret_val;
     // set the signal return, to stop all statement evaluation
     ctxt->sig_ret = 1;        
 }
