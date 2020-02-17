@@ -5,7 +5,7 @@ INCLUDE_FILES=main.c lexer.c parser.c ast.c core/*.c debug/*.c io/*.c europa/*.c
 LINKER_FLAGS=
 export INCLUDE_DIR=-I$(SRC_DIR)/include -I$(SRC_DIR)/core/include -I$(SRC_DIR)/debug/include -I$(SRC_DIR)/io/include -I$(SRC_DIR)/europa/include
 export GCC_FLAGS=-O3
-export DEBUG_GCC_FLAGS=-O0 -DDEBUG -ggdb
+export DEBUG_GCC_FLAGS=-O0 -DDEBUG -ggdb -fsanitize=address
 
 all:
 	$(CCOMPILER) -o $(EXEC_FILE_NAME) $(INCLUDE_DIR) $(GCC_FLAGS) $(INCLUDE_FILES) $(LINKER_FLAGS)
