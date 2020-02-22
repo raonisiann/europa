@@ -46,6 +46,25 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node, s
 	}
 }
 
+// Run evaluation of all parameters in the list 
+// and return a new list of e_value
+struct list *param_eval(struct ast_node *fcall_node, struct e_context *ctxt){
+	struct list_item *input_arg = NULL;
+	// value after expression eval 
+	struct e_value *res_value = NULL;
+	struct list *res_param_list = NULL; 
+	res_param_list = list_create();
+	// get first parameter
+	input_arg = fcall_node->fcall->expr_list->first;
+	while(input_arg != NULL){		
+		DEBUG_OUTPUT("INPUT_ARG_EXPR_EVAL");
+		res_value = expr_eval((struct ast_node *)input_arg->data, ctxt);
+		list_add_item(res_param_list, res_value);
+		input_arg = input_arg->next;
+	}	
+	return res_param_list;
+}
+
 struct e_value *function_eval(struct ast_node *fcall_node, struct e_context *ctxt){
 	DEBUG_OUTPUT("FUNC_EVAL_STARTING");
 	struct e_reference *fdef = NULL;	
