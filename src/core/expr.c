@@ -238,27 +238,29 @@ char *convert_to_string_value(struct e_value *v){
 			snprintf(number_temp, 21, "%i", v->num);
 			//return strndup(number_temp, strlen(number_temp));					    
             return _STRING_DUP(number_temp);
-		case e_string:
-			//return strndup(v->str, strlen(v->str));		
-            return _STRING_DUP(number_temp);
-		case e_boolean:			
-			if(v->boolean == 0){
-				v->str = (char *)memm_alloc(sizeof(char) * 6);
-				strncpy(v->str, "e_false\0", 6);
-			}else{
-				v->str = (char *)memm_alloc(sizeof(char) * 5);
-				strncpy(v->str, "e_true\0", 5);
-			}
-			return v->str;
-		break;
+		case e_string:			
+            return v->str;
+		case e_boolean:	
+            switch(v->boolean){
+                case e_true: 
+                    v->str = (char *)memm_alloc(sizeof(char) * 5);                    
+				    strncpy(v->str, "true\0", 5);
+                    break;
+                case e_false:
+                    v->str = (char *)memm_alloc(sizeof(char) * 6);
+				    strncpy(v->str, "false\0", 6);
+                    break;
+                default:
+                    EUROPA_ERROR("internal error: Unknown boolean value");
+            }        		
+			return v->str;		    
 		case e_undefined:
 			// return a empty string for this case
 			v->str = (char *)memm_alloc(sizeof(char));
 			strncpy(v->str, "\0", 1);
-			return v->str;
-		break;
+			return v->str;		    
 		default:			
-			printf("Some crazy error\n");
+			EUROPA_ERROR("internal error: Unable to convert string");
 	}
 }
 
