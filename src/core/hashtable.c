@@ -134,39 +134,12 @@ int ht_set(hashtable *ht, struct e_reference *ref){
     bucket = &ht->table[index];
 	if(bucket->head == NULL){
 		bucket->head = entry;
-		bucket->tail = entry;
-		ht->free = ht->free - 1;
-	}else{
-		//
-		//
-		//
-		// 	REVIEW THE RE-ASSIGN PROCESS 
-		//
-		//
-		//
-		i = bucket->head;
-		while(i != NULL){			
-			if(strcmp(i->data->name, ref->name) == 0){			
-				reassign = 1;				
-				break;
-			}			
-			i = i->next;
-		}		
-		// new item
-		if(reassign == 0){
-			bucket->tail->next = entry;
-			bucket->tail = entry;
-			ht->free = ht->free - 1;
-		}else{ 
-			// discard old data
-			//memm_free(i->data->value);
-			memm_free(i->data);
-			// discard entry allocated previuosly			
-			memm_free(entry); 
-			// reassignemnt
-			i->data = ref;	
-		}			
+		bucket->tail = entry;		
+	}else{		
+		bucket->tail->next = entry;
+		bucket->tail = entry;		
 	}	
+	ht->free = ht->free - 1;
     return index;
 }
 
