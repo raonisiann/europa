@@ -40,5 +40,10 @@ void functions_load_builtin(struct function_lib_metadata *lib);
 //
 // function list declaration
 // 
+BUILTIN_FUNC_LOAD(print);
+BUILTIN_FUNC_DEF(print, bar);
+BUILTIN_FUNC_DEF(print, foo);
+BUILTIN_FUNC_DEF(print, bletch);
+BUILTIN_FUNC_DEF(print, print);
 
 #endif
