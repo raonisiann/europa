@@ -20,7 +20,8 @@ typedef enum {
     e_boolean, 
     e_reference,
     e_fcall,
-    e_fdef
+    e_fdef,
+    e_fbuiltin
 } e_type; 
 
 struct e_array {
@@ -43,17 +44,6 @@ struct e_fcall {
     struct e_value *ret;
 };
 
-struct e_reference {
-    char type;
-    char *name;   
-    union {
-        struct e_value *value;       
-        struct e_fcall *fcall;
-        struct e_func_def *funcdef; 
-    };
-    unsigned int ht_hash;
-};
-
 struct e_assignment {
     struct e_reference *ref; 
     struct ast_node *ast;
@@ -65,6 +55,18 @@ struct e_func_def {
     struct e_context *ctxt; 
 };
 
+struct e_reference {
+    char type;
+    char *name;   
+    union {
+        struct e_value *value;       
+        struct e_fcall *fcall;
+        struct e_func_def *funcdef; 
+        struct eu_func_builtin *bfunc;
+        void (*eu_func_entry_ptr) (struct list *, struct e_context *);
+    };
+    unsigned int ht_hash;
+};
 
 struct e_assignment *factory_assigment();
 struct e_value *factory_value();

@@ -5,6 +5,7 @@
 #include "europa_debug.h"
 #include "europa_error.h"
 #include "context.h"
+#include "functions.h"
 
 extern FILE *LEX_INPUT;
 
@@ -32,6 +33,7 @@ int main(int argc, char *argv[]){
         printf("Europa 0.1 \n");
     }  
 
+    functions_init();
     // do what you have to do
     return parser_start();    
 }
