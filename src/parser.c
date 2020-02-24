@@ -78,6 +78,20 @@ void eu_lang(){
 
 void eu_shell(){
 
+    printf("Europa Language (%s) version %s\n", EU_BUILT_OS, EU_VERSION);
+    printf("Built on %s\n", EU_BUILT_DATE);
+    printf("\n"        
+        "   _____                                \n"
+        "  |  ___|                               \n"
+        "  | |__ _   _ _ __ ___  _ __   __ _     \n"
+        "  |  __| | | | '__/ _ \\| '_ \\ / _` |  \n"
+        "  | |__| |_| | | | (_) | |_) | (_| |    \n"
+        "  \\____/\\__,_|_|  \\___/| .__/ \\__,_|\n"
+        "                       | |              \n"
+        "                       |_|              \n"
+        "\n"
+        "\n"
+    );   
 
     struct e_stmt *stmt = NULL; 
     struct list *results = NULL;    
