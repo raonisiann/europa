@@ -11,7 +11,9 @@ int parser_start();
 
 void parser_error_expected(char *s, ...);
 
-void lang();
+void eu_shell();
+void eu_lang();
+struct e_stmt *top_level();
 struct e_stmt *stmt();
 struct ast_node* expr();
 struct ast_node* term();

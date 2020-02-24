@@ -5,6 +5,7 @@
 #include "europa_io.h"
 #include "lexer.h"
 
+extern char europa_shell_mode;
 
 void europa_raise_error(char *s, ...){
     char output_string[100];    
@@ -12,7 +13,10 @@ void europa_raise_error(char *s, ...){
 	va_start(ap, s);	
     vsprintf(output_string, s, ap);	
     va_end(ap);    
-    EUROPA_OUTPUT("\nERROR ==>> %s\n\nProgram is terminating...\n", output_string);
-    exit(-1);
+    EUROPA_OUTPUT("\nERROR ==>> %s\n\n", output_string);
+    if(europa_shell_mode == 0){
+        printf("Program is terminating...\n");
+        exit(-1);
+    }    
 }
 

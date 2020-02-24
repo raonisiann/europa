@@ -10,6 +10,7 @@
 #include "list.h"
 #include "europa_debug.h"
 #include "europa_error.h"
+#include "europa.h"
 
 extern struct lex_token *lex_tk;
 
@@ -42,30 +43,55 @@ void parser_error_expected(char *s, ...){
 //
 // start the parsing of the lang 
 //
-void lang(){        
+struct e_stmt *top_level(){  
+    struct e_stmt *lang = NULL;      
+    if(parser_accept(newline)){              
+        return NULL;
+    }else if(parser_accept(eof)){        
+        return NULL;
+    }else if(parser_accept(defcmd)){     
+        // function definition
+        // def FUNC_NAME '(' FUNC_ARGS ')' '{' FUNC_BODY '}'              
+        func_def(); 
+        return NULL;           
+    }else{        
+        lang = stmt();                                    
+        return lang;
+    }                        
+}
+
+void eu_lang(){    
+    struct e_stmt *stmt = NULL; 
     while(1){        
-        if(parser_accept(newline)){            
-            lex_next_token();                                         
-        }else if(parser_accept(eof)){
-            DEBUG_OUTPUT("END_OF_FILE");   
-            break;
-        }else if(parser_accept(defcmd)){     
-            // function definition
-            // def FUNC_NAME '(' FUNC_ARGS ')' '{' FUNC_BODY '}'              
-            func_def();            
-        }else{
-            struct e_stmt *_stmt = NULL;
-            _stmt = stmt();                                    
-            if(_stmt != NULL){
-                // eval statement....
-                stmt_eval(_stmt, GLOBAL_CTXT);
-            } 
-            if(parser_accept(newline)){
-                lex_next_token();           
-            }                      
+        lex_next_token();        
+        stmt = top_level();
+        if(stmt != NULL){
+            stmt_eval(stmt, GLOBAL_CTXT);
         } 
-                      
-    }    
+        // end of file reached... ending program..
+        if(parser_accept(eof)){            
+            break;
+        }
+    }
+}
+
+
+void eu_shell(){
+
+
+    struct e_stmt *stmt = NULL; 
+    struct list *results = NULL;    
+    while(1){
+        printf("europa> ");
+        // read
+        lex_next_token();
+        // parser instruction 
+        stmt = top_level();
+        if(stmt != NULL){
+            // execute 
+            stmt_eval(stmt, GLOBAL_CTXT);
+        }        
+    }
 }
 
 void func_def(){
@@ -334,13 +360,4 @@ struct list *expr_list(){
     }  
     parser_expect(cparenteses);
     return l;
-}
-
-// start point...
-int parser_start(){
-
-    lex_init();   
-    lex_next_token();
-    lang();   
-    return 0;
 }
