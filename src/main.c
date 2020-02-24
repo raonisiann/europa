@@ -19,8 +19,7 @@ int main(int argc, char *argv[]){
     LEX_INPUT = LEX_INPUT_DEFAULT;
     // create the global context
     GLOBAL_CTXT = context_create(100);
-
-    europa_buffer_init();
+    
     functions_init();       
     lex_init();
 
