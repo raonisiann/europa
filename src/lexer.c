@@ -106,8 +106,7 @@ char lex_token_text[36][27] = {
 // with lex_cur_ch. 
 int lex_match(const char expected){        
     if(expected != lex_cur_ch){
-        printf("Unexpected character '%c' at position %i line %i\n", lex_cur_ch, lex_cur_ch_pos, lex_cur_line);
-        lex_terminator();
+        lex_error("Unexpected character");        
     }
     DEBUG_OUTPUT("Matched  -> %c\n", expected);    
     return 1;	
@@ -152,7 +151,7 @@ void lex_next_token(){
                     lex_cur_line++;     
                     break;                  
                 }else{
-                    EUROPA_ERROR("Unable to handler non-newline after return. Expected '\\r\\n'.");
+                    lex_error("Unable to handler non-newline after return. Expected '\\r\\n'.");
                 }
             case '"':
                 // start string capture   
@@ -231,8 +230,7 @@ void lex_next_token(){
                 }                
                 break;                                             
             default: 
-                EUROPA_ERROR("Unable to handle character '%c' at position %i line %i\n", lex_cur_ch, lex_cur_ch_pos, lex_cur_line);
-                lex_terminator();
+                lex_error("Unable to handle character");
         }        
     }       
 }
@@ -251,7 +249,7 @@ struct lex_token *lex_cap_digit(){
     lex_unget_char();
     // if nothing has been captured raise an error
     if(buf_size == 0){
-        lex_error("Fail to capture a digit\n");
+        lex_error("Fail to capture a digit");
     }    
     return lex_create_tk(integer, buf_size, buf);
 }
@@ -303,7 +301,7 @@ struct lex_token *lex_cap_string(){
                     buf[buf_size] = LEX_SCAPE_CHAR;
                 break;                                                                                            
                 default: 
-                    lex_error("Invalid scape squence\n");          
+                    lex_error("Invalid scape char");          
             }            
         }else{
             buf[buf_size] = lex_cur_ch;
@@ -316,7 +314,7 @@ struct lex_token *lex_cap_string(){
     lex_unget_char(); 
     // if nothing has been captured raise an error
     if(buf_size == 0){
-        lex_error("Fail to capture a string\n");
+        lex_error("Fail to capture a string");
     }       
     return lex_create_tk(string, buf_size, buf);
 }
@@ -334,8 +332,9 @@ struct lex_token *lex_cap_reference(){
     buf[buf_size] = '\0';
     lex_unget_char();    
     // if nothing has been captured raise an error
+    // unlikely... 
     if(buf_size == 0){
-        lex_error("Fail to capture a reference\n");
+        lex_error("Fail to capture a reference");
     }    
     if(buf_size < 10){
         int k = 0;
@@ -394,22 +393,14 @@ void lex_unget_char(){
     lex_cur_ch_pos--;
 }
 
-
-void lex_expected(const char expected){
-    printf("It was expected '%c', but we found '%c' at position %i, line %i\n", expected, lex_cur_ch, lex_cur_ch_pos, lex_cur_line);
-    lex_terminator();
-}
-
 // Lex error function... 
-void lex_error(const char *error){
-    printf("Error raised: %s\n", error);    
-    lex_terminator();
-}
-
-// Terminates the program 
-void lex_terminator(){
-    printf("Program is exiting due to an unrecoverable error.\n");
-    exit(-1);
+void lex_error(const char *error){    
+    EUROPA_ERROR("%s: Found '%c' at line %i, char %i", 
+        error,
+        lex_cur_ch, 
+        lex_cur_line, 
+        lex_cur_ch_pos
+    );                
 }
 
 void lex_clear_capture_buffer(char *buffer, unsigned int size){

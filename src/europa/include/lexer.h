@@ -142,9 +142,7 @@ void lex_unget_char();
 // error/expection control functions
 //
 
-void lex_expected(const char expected);
 void lex_error(const char *error);
-void lex_terminator();
 
 void lex_ignore_white_spaces();
 
