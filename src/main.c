@@ -13,7 +13,11 @@ extern FILE *LEX_INPUT;
 extern char europa_shell_mode;
 
 int main(int argc, char *argv[]){
-
+    #ifdef DEBUG 
+        europa_debug_init();
+        DEBUG_OUTPUT("\n\nSTART DEBUG\n=================================\n")
+    #endif 
+    
 // setting the default to stdin 
     char *input_file_name;
     LEX_INPUT = LEX_INPUT_DEFAULT;
@@ -23,11 +27,6 @@ int main(int argc, char *argv[]){
     functions_init();       
     lex_init();
 
-    #ifdef DEBUG 
-        europa_debug_init();
-        DEBUG_OUTPUT("\n\nSTART DEBUG\n=================================\n")
-    #endif 
-    
 	if(argc > 1){
         // parse the language as non-interactive mode 
 		if((LEX_INPUT = fopen(argv[1], "r")) != NULL){
