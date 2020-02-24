@@ -141,14 +141,16 @@ void lex_next_token(){
             case '\n':
                 // new line capture                 
                 lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
-                lex_cur_line++;                                 
+                lex_cur_line++;    
+                lex_cur_ch_pos = 0;
                 break;
             case '\r':
                 lex_next_char();
                 if(lex_cur_ch == '\n'){
                     // new line capture                 
                     lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
-                    lex_cur_line++;     
+                    lex_cur_line++;
+                    lex_cur_ch_pos = 0;     
                     break;                  
                 }else{
                     lex_error("Unable to handler non-newline after return. Expected '\\r\\n'.");
@@ -436,6 +438,6 @@ void lex_init(){
     
     lex_cur_ch = '\0';
     lex_prev_ch = '\0';
-    lex_cur_ch_pos = 0;
+    lex_cur_ch_pos = 1;
     lex_cur_line = 1;    
 }
