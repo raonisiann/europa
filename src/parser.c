@@ -316,8 +316,7 @@ struct ast_node* factor(){
     }else if(parser_accept(osqbrackets)){        
         lex_next_token();
     }else{
-        DEBUG_OUTPUT("Syntax error: Cannot be -->> %s <<-- here", lex_tk->raw_value);
-        lex_terminator();
+        EUROPA_ERROR("Syntax error: Cannot be -->> %s <<-- here", lex_tk->raw_value);        
     }   
     return leaf;     
 }
