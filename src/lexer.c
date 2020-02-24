@@ -375,12 +375,15 @@ struct lex_token *lex_create_tk(int class, unsigned int size, char *value){
     struct lex_token *tk = memm_alloc(sizeof(struct lex_token));
     tk->class = class;
     if(size > 0){
-        tk->size = size;
-        //tk->raw_value = strndup(value, size);
+        tk->size = size;        
         tk->raw_value = _STRING_DUP(value);
+        tk->line_num = lex_cur_line;
+        tk->end_pos = lex_cur_ch_pos;
     }else{
         tk->size = size;
-        tk->raw_value = NULL;        
+        tk->raw_value = NULL;   
+        tk->line_num = 0;
+        tk->end_pos = 0;     
     }    
     return tk;
 }
