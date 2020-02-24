@@ -28,11 +28,11 @@ int parser_expect(int token){
     if(parser_accept(token)){
         return 1;
     }
-    parser_error_expected("Unexpected %s '%s', should be an %s instead.\n", lex_token_to_text(lex_tk->class), lex_tk->raw_value, lex_token_to_text(token));
+    parser_error("Unexpected %s '%s', should be an %s instead.\n", lex_token_to_text(lex_tk->class), lex_tk->raw_value, lex_token_to_text(token));
 }
 
 // 
-void parser_error_expected(char *s, ...){
+void parser_error(char *s, ...){
     va_list ap;
 	va_start(ap, s);	
 	vfprintf(stderr, s, ap);	
