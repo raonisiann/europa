@@ -75,7 +75,9 @@ typedef enum {
 struct lex_token {
     lex_token_class class;
     unsigned int size; 
-    char *raw_value;    
+    unsigned int line_num;
+    unsigned short end_pos; 
+    char *raw_value;        
 };
 
 struct reserved_word {
