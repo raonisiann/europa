@@ -322,8 +322,21 @@ struct lex_token *lex_cap_string(){
 // capture references
 struct lex_token *lex_cap_reference(){
     char buf[LEX_CAP_BUFFER];
-    unsigned int buf_size = 0;           
-    while(isalpha(lex_cur_ch)){
+    unsigned int buf_size = 0;       
+
+    // first char must be an alpha [a-zA-Z]
+    if(isalpha(lex_cur_ch)){
+        buf[buf_size] = lex_cur_ch;
+        lex_next_char();
+        buf_size++;
+    }
+    // Then it's allowed to have numbers, 
+    // underscore (_), dash (-)
+    // [a-zA-z_-]
+    while(isalpha(lex_cur_ch) || 
+            isdigit(lex_cur_ch) || 
+            lex_cur_ch == '-' ||
+            lex_cur_ch == '_'){
         buf[buf_size] = lex_cur_ch;
         lex_next_char();
         buf_size++;
