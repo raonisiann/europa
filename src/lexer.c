@@ -262,12 +262,16 @@ struct lex_token *lex_cap_digit(){
 // just demiliters on where the char sequence starts
 // or ends.
 struct lex_token *lex_cap_string(){
+    char *string_captured = NULL;
     char buf[LEX_CAP_BUFFER];
-    unsigned int buf_size = 0;
+    unsigned int string_size = 0;
+    unsigned int buf_size = 0;    
     lex_next_char(); // ignoring opening quotes
     while(1){
         if (buf_size >= LEX_CAP_BUFFER){
-            break;            
+            string_captured = memm_alloc(sizeof(char) * buf_size);
+            strncat(string_captured, buf, buf_size);
+            buf_size = 0;
         }
         if(lex_cur_ch == LEX_DOUBLE_QUOTE){
             lex_next_char();
@@ -311,11 +315,19 @@ struct lex_token *lex_cap_string(){
         }        
         lex_next_char();
         buf_size++;
+        string_size++;
+    }    
+    if(string_size > LEX_CAP_BUFFER){
+        string_captured = memm_realloc(string_captured, sizeof(char) * string_size);
+        strncat(string_captured, buf, buf_size);        
+    }else{        
+        string_captured = memm_alloc(sizeof(char) * buf_size);
+        strncpy(string_captured, buf, buf_size);        
     }
     // ending buffer
-    buf[buf_size] = '\0';   
+    string_captured[string_size] = '\0';
     lex_unget_char();        
-    return lex_create_tk(string, buf_size, buf);
+    return lex_create_tk(string, string_size, string_captured);
 }
 
 // capture references
