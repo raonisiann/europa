@@ -8,8 +8,7 @@ int parser_accept(int token);
 int parser_expect(int token);
 
 int parser_start();
-
-void parser_error(char *s, ...);
+void parser_error(const char *error, int expected);
 
 void eu_shell();
 void eu_lang();

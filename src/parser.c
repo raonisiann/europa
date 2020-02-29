@@ -28,16 +28,21 @@ int parser_expect(int token){
     if(parser_accept(token)){
         return 1;
     }
-    parser_error("Unexpected %s '%s', should be an %s instead.\n", lex_token_to_text(lex_tk->class), lex_tk->raw_value, lex_token_to_text(token));
+    parser_error("Unexpected token", token);
 }
 
-// 
-void parser_error(char *s, ...){
-    va_list ap;
-	va_start(ap, s);	
-	vfprintf(stderr, s, ap);	
-    va_end(ap);
-    exit(-1);
+// Parser Error raise an europa error which 
+// could terminates the program
+void parser_error(const char *error, int expected){
+    EUROPA_ERROR(
+        "Syntax Error: %s '%s' (%s) found at line %i, char %i. Expecting '%s' instead",
+        error, 
+        lex_tk->raw_value, 
+        lex_token_to_text(lex_tk->class),
+        lex_tk->line_num,
+        lex_tk->end_pos - lex_tk->size,        
+        lex_token_to_text(expected)
+    );
 }
 
 //
@@ -167,7 +172,8 @@ struct e_stmt *stmt(){
         if(parser_accept(assign)){                                   
             lex_next_token(); 
             if(_expr->type != node_assign){
-                EUROPA_ERROR("An assign must use be of type 'reference'");
+                parser_error("Invalid type", reference);
+                return NULL;
             }                        
             _expr->assign->expr = expr();
             return stmt_create_assign(_expr);
@@ -316,7 +322,7 @@ struct ast_node* factor(){
     }else if(parser_accept(osqbrackets)){        
         lex_next_token();
     }else{
-        EUROPA_ERROR("Syntax error: Cannot be -->> %s <<-- here", lex_tk->raw_value);        
+        parser_error("Unexpected token", parserexpr);
     }   
     return leaf;     
 }
