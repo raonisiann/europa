@@ -314,11 +314,7 @@ struct lex_token *lex_cap_string(){
     }
     // ending buffer
     buf[buf_size] = '\0';   
-    lex_unget_char(); 
-    // if nothing has been captured raise an error
-    if(buf_size == 0){
-        lex_error("Fail to capture a string");
-    }       
+    lex_unget_char();        
     return lex_create_tk(string, buf_size, buf);
 }
 
