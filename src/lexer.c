@@ -320,12 +320,15 @@ struct lex_token *lex_cap_string(){
     if(string_size > LEX_CAP_BUFFER){
         string_captured = memm_realloc(string_captured, sizeof(char) * string_size);
         strncat(string_captured, buf, buf_size);        
-    }else{        
+    }if(string_size == 0){        
+        string_captured = memm_alloc(sizeof(char));
+    }
+    else{        
         string_captured = memm_alloc(sizeof(char) * buf_size);
         strncpy(string_captured, buf, buf_size);        
     }
     // ending buffer
-    string_captured[string_size] = '\0';
+    string_captured[string_size] = '\0';    
     lex_unget_char();        
     return lex_create_tk(string, string_size, string_captured);
 }
@@ -391,7 +394,7 @@ struct lex_token *lex_create_tk(int class, unsigned int size, char *value){
         tk->line_num = lex_cur_line;
         tk->end_pos = lex_cur_ch_pos;
     }else{
-        tk->size = size;
+        tk->size = 0;
         tk->raw_value = NULL;   
         tk->line_num = 0;
         tk->end_pos = 0;     

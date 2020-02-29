@@ -292,8 +292,12 @@ int do_number_compare(int n1, int n2){
 void value_eval(struct e_value *v){	
     if(v != NULL){
         switch(v->type){
-            case e_string:                           
-                EUROPA_OUTPUT("%s\n", v->str);
+            case e_string:  
+                if(v->size > 0){
+                    EUROPA_OUTPUT("%s\n", v->str);
+                }else{
+                    EUROPA_OUTPUT("");
+                }                
                 break;
             case e_int:                      
                 EUROPA_OUTPUT("%i\n", v->num);                
