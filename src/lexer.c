@@ -63,7 +63,7 @@ struct reserved_word lex_reserved_words[10][7] = {
     }    
 };
 
-char lex_token_text[36][27] = {    
+char lex_token_text[37][27] = {    
     "new line",
     "integer", 
     "string",
@@ -99,7 +99,8 @@ char lex_token_text[36][27] = {
     "include",
     "function call",
     "expression",
-    "return"
+    "return",
+    "factor"    
 };
 
 // Exactly match the "match"
