@@ -84,7 +84,7 @@ void eu_lang(){
 void eu_shell(){
 
     printf("Europa Language (%s) version %s\n", EU_BUILT_OS, EU_VERSION);
-    printf("Built on %s\n", EU_BUILT_DATE);
+    printf("Built on %s %s\n", EU_BUILT_DATE, EU_DEBUG_INFO);
     printf("\n"        
         "   _____                                \n"
         "  |  ___|                               \n"

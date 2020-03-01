@@ -1,8 +1,13 @@
-
 #define EU_VERSION "0.1"
 #define EU_BUILT_DATE __TIMESTAMP__
 
 char europa_shell_mode;
+
+#if DEBUG
+#define EU_DEBUG_INFO "with debug flag"
+#else
+#define EU_DEBUG_INFO ""
+#endif
 
 // Detect where the program is being compiled... 
 // 
