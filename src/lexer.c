@@ -132,7 +132,11 @@ void lex_next_token(){
     // TODO: if end of file return LEX_EOF
     // TODO: if start with //, comment   
     if(feof(LEX_INPUT)){
-        lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");         
+        lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");     
+    }else if(lex_cur_ch == '#'){
+        while(lex_cur_ch != '\n'){
+            lex_next_char();
+        } 
     }else if(isdigit(lex_cur_ch)){
         // start digit/number capture         
         lex_tk = lex_cap_digit();
@@ -140,7 +144,7 @@ void lex_next_token(){
         // start identifier/keyword capture         
         lex_tk = lex_cap_reference();    
     }else{
-        switch(lex_cur_ch){
+        switch(lex_cur_ch){                
             case '\n':
                 // new line capture                 
                 lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
