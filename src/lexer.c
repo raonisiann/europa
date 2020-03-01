@@ -23,12 +23,14 @@ struct reserved_word lex_reserved_words[10][7] = {
     // Size 2 comamnds
     {
         {"if", ifcmd},
+        {"or", oroper},
         {NULL, undefined}
     },
     // Size 3 comamnds
     {
         {"def", defcmd},
         {"ret", returncmd},
+        {"and", andoper},
         {NULL, undefined}
     },
     // Size 4 comamnds
