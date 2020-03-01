@@ -9,8 +9,8 @@
 #include "context.h"
 
 typedef enum {
-    e_false = '0',
-    e_true = '1'
+    e_false = 0,
+    e_true = 1
 } e_bool;
 
 typedef enum {
@@ -32,7 +32,7 @@ struct e_value {
     char type;     
     unsigned int size;     
     union {
-        char boolean;  
+        unsigned int boolean;  
         int num;                    
         char *str;                    
         struct e_array *arr;    
