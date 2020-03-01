@@ -1,6 +1,6 @@
 EXEC_FILE_NAME=$(BIN_DIR)\europa.exe
-C_FILES=$(SRC_DIR)\main.c $(SRC_DIR)\lexer.c $(SRC_DIR)\parser.c $(SRC_DIR)\ast.c $(SRC_DIR)\core\*.c $(SRC_DIR)\debug\*.c $(SRC_DIR)\io\*.c $(SRC_DIR)\europa\*.c
-INCLUDE_DIR=/I$(SRC_DIR)\include /I$(SRC_DIR)\core\include /I$(SRC_DIR)\debug\include /I$(SRC_DIR)\io\include /I$(SRC_DIR)\europa\include
+C_FILES=$(SRC_DIR)\main.c $(SRC_DIR)\lexer.c $(SRC_DIR)\parser.c $(SRC_DIR)\ast.c $(SRC_DIR)\core\*.c $(SRC_DIR)\debug\*.c $(SRC_DIR)\io\*.c $(SRC_DIR)\europa\*.c $(SRC_DIR)\functions\*.c $(SRC_DIR)\functions\builtin\*.c
+INCLUDE_DIR=/I$(SRC_DIR)\include /I$(SRC_DIR)\core\include /I$(SRC_DIR)\debug\include /I$(SRC_DIR)\io\include /I$(SRC_DIR)\europa\include -I$(SRC_DIR)\functions\include
 
 all: 
     echo $(MAKEDIR)
