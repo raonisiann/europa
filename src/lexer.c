@@ -268,19 +268,21 @@ struct lex_token *lex_cap_digit(){
 // just demiliters on where the char sequence starts
 // or ends.
 struct lex_token *lex_cap_string(){
-    char *string_captured = NULL;
+    char *string_captured = memm_alloc(sizeof(char));	
     char buf[LEX_CAP_BUFFER];
     unsigned int string_size = 0;
-    unsigned int buf_size = 0;    
+    unsigned int buf_size = 0;
+	// initialize string with null terminator
+	string_captured[0] = '\0';
     lex_next_char(); // ignoring opening quotes
     while(1){
-        if (buf_size >= LEX_CAP_BUFFER){
-            string_captured = memm_alloc(sizeof(char) * buf_size);
-            strncat(string_captured, buf, buf_size);
+        if (buf_size >= LEX_CAP_BUFFER){			
+			string_captured = memm_realloc(string_captured, sizeof(char) * (string_size + 1));
+			string_captured = strncat(string_captured, buf, buf_size);			
             buf_size = 0;
         }
         if(lex_cur_ch == LEX_DOUBLE_QUOTE){
-            lex_next_char();
+            lex_next_char();			
             break;
         }
         if(lex_cur_ch == LEX_SCAPE_CHAR){
@@ -323,18 +325,10 @@ struct lex_token *lex_cap_string(){
         buf_size++;
         string_size++;
     }    
-    if(string_size > LEX_CAP_BUFFER){
-        string_captured = memm_realloc(string_captured, sizeof(char) * string_size + 1);
-        strncat(string_captured, buf, buf_size);        
-    }if(string_size == 0){        
-        string_captured = memm_alloc(sizeof(char));
+    if(string_size > LEX_CAP_BUFFER || string_size != 0){		
+        string_captured = memm_realloc(string_captured, sizeof(char) * (string_size + 1));
+        strncat(string_captured, buf, buf_size);        		
     }
-    else{        
-        string_captured = memm_alloc(sizeof(char) * buf_size + 1);
-        strncpy(string_captured, buf, buf_size);        
-    }	
-    // ending buffer
-    string_captured[string_size] = '\0';    
     lex_unget_char();        
     return lex_create_tk(string, string_size, string_captured);
 }
@@ -391,7 +385,7 @@ struct lex_token *lex_cap_reference(){
 }
 
 // Create a lex token 
-struct lex_token *lex_create_tk(int class, unsigned int size, char *value){
+struct lex_token *lex_create_tk(int class, unsigned int size, char *value){	
     struct lex_token *tk = memm_alloc(sizeof(struct lex_token));
     tk->class = class;
     if(size > 0){
