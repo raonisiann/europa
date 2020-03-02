@@ -8,7 +8,7 @@
 extern char europa_shell_mode;
 
 void europa_raise_error(char *s, ...){
-    char output_string[100];    
+    char output_string[256];    
     va_list ap;
 	va_start(ap, s);	
     vsprintf(output_string, s, ap);	
