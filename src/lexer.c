@@ -65,7 +65,8 @@ struct reserved_word lex_reserved_words[10][7] = {
     }    
 };
 
-char lex_token_text[37][27] = {    
+char lex_token_text[38][27] = {   
+	"EOF", 
     "new line",
     "integer", 
     "string",
@@ -440,7 +441,10 @@ void lex_clear_capture_buffer(char *buffer, unsigned int size){
 }
 
 char *lex_token_to_text(int tk_class){
-    return lex_token_text[tk_class - 1];
+	if(tk_class < 0){
+		return "Undefined"; 
+	}
+    return lex_token_text[tk_class];
 }
 
 // Initialize lexer settings
