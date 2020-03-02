@@ -226,8 +226,7 @@ char *do_string_concat(struct e_value *str1, struct e_value *str2){
 	new_str_size = strlen(dst_str) + strlen(src_str); 
 	// realocate the destination string and doing the concatenation
 	dst_str = (char *)memm_realloc(dst_str, (new_str_size + 1));
-	dst_str = strncat(dst_str, src_str, new_str_size);
-	dst_str[new_str_size + 1] = '\0';
+	dst_str = strncat(dst_str, src_str, new_str_size);	
 	return dst_str;
 }
 
