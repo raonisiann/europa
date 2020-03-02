@@ -217,77 +217,35 @@ struct list *stmt_block(){
 
 struct ast_node* expr(){   
     struct ast_node* left = NULL;
-    struct ast_node* right = NULL;
-    struct ast_node* parent = NULL;
+	struct lex_token *tk = NULL; 
     left = term();     
-    if(TOKEN == plus || TOKEN == minus || TOKEN == andoper || TOKEN == oroper){                
-        switch(TOKEN){
-            case plus:             
-                parser_expect(plus);                                                                                                  
-                break;
-            case minus:                            
-                parser_expect(minus);                                                                  
-                break;
-            case andoper:                            
-                parser_expect(andoper);                                                                  
-                break;
-            case oroper:                            
-                parser_expect(oroper);                                                                  
-                break;                                
-        } 
-        parent = ast_add_token_node(lex_tk, left, NULL);
-        lex_next_token();
-        right = expr();            
-        parent->right = right;
-        return parent;
+    while(TOKEN == plus || TOKEN == minus || TOKEN == andoper || TOKEN == oroper){ 
+		tk = lex_tk;
+        lex_next_token();		
+		left = ast_add_token_node(tk, left, term());
     }    
-    return left;    
+    return left;
 }
 
 
-struct ast_node* term(){   
-    struct ast_node* left = NULL;
-    struct ast_node* right = NULL;   
-    struct ast_node* parent = NULL;  
-    left = factor();
-    if(TOKEN == multiply || TOKEN == division || TOKEN == equal || TOKEN == notequal || TOKEN == gt || TOKEN == gte || TOKEN == lt || TOKEN == lte){        
-        switch(TOKEN){
-            case multiply:
-                parser_expect(multiply);                
-                break;
-            case division:
-                parser_expect(division);                
-                break;
-            case equal:
-                parser_expect(equal);                
-                break;                
-            case notequal:
-                parser_expect(notequal);                
-                break;                  
-            case gt: 
-                parser_expect(gt);                
-                break;                                  
-            case gte: 
-                parser_expect(gte);                
-                break;                          
-            case lt: 
-                parser_expect(lt);                
-                break;                                  
-            case lte: 
-                parser_expect(lte);                
-                break;                                          
-        }
-        parent = ast_add_token_node(lex_tk, left, NULL); 
-        lex_next_token();
-        right = term();   
-        parent->right = right;  
-        return parent;        
+struct ast_node* term(){   	
+    struct ast_node* fct = NULL;
+	struct ast_node* parent = NULL;
+	struct lex_token *tk = NULL; 
+    fct = factor();
+    while(TOKEN == multiply || TOKEN == division || TOKEN == equal || TOKEN == notequal || TOKEN == gt || TOKEN == gte || TOKEN == lt || TOKEN == lte){
+		tk = lex_tk;		
+        lex_next_token();		
+		parent = ast_add_token_node(tk, fct, term());         
     }  
-    return left;  
+	if(parent == NULL){
+		parent = fct; 
+	}
+    return parent;   
 }
 
 
-struct ast_node* factor(){   
+struct ast_node* factor(){ 
     struct ast_node* leaf = NULL;   
     if(parser_accept(integer)){
         DEBUG_OUTPUT("FACTOR -> DIGIT (%i) %s", lex_tk->size, lex_tk->raw_value);                 
