@@ -324,15 +324,15 @@ struct lex_token *lex_cap_string(){
         string_size++;
     }    
     if(string_size > LEX_CAP_BUFFER){
-        string_captured = memm_realloc(string_captured, sizeof(char) * string_size);
+        string_captured = memm_realloc(string_captured, sizeof(char) * string_size + 1);
         strncat(string_captured, buf, buf_size);        
     }if(string_size == 0){        
         string_captured = memm_alloc(sizeof(char));
     }
     else{        
-        string_captured = memm_alloc(sizeof(char) * buf_size);
+        string_captured = memm_alloc(sizeof(char) * buf_size + 1);
         strncpy(string_captured, buf, buf_size);        
-    }
+    }	
     // ending buffer
     string_captured[string_size] = '\0';    
     lex_unget_char();        
