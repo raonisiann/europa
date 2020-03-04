@@ -137,7 +137,9 @@ void lex_next_token(){
     }else if(lex_cur_ch == '#'){
         while(lex_cur_ch != '\n'){
             lex_next_char();
-        } 
+        }		
+		lex_cur_line++;    
+        lex_cur_ch_pos = 0;		
     }else if(isdigit(lex_cur_ch)){
         // start digit/number capture         
         lex_tk = lex_cap_digit();
@@ -240,6 +242,7 @@ void lex_next_token(){
                 }                
                 break;                                             
             default: 
+				lex_next_char();
                 lex_error("Unable to handle character");
         }        
     }       
