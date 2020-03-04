@@ -250,7 +250,12 @@ struct ast_node* factor(){
     if(parser_accept(integer)){
         DEBUG_OUTPUT("FACTOR -> DIGIT (%i) %s", lex_tk->size, lex_tk->raw_value);                 
         leaf = ast_add_value_node(token_to_integer(lex_tk),  NULL, NULL);
-        lex_next_token();        
+        lex_next_token();    
+	}else if(parser_accept(minus)){		
+		lex_next_token();
+		parser_expect(integer);
+		leaf = ast_add_value_node(token_to_neg_integer(lex_tk),  NULL, NULL);
+		lex_next_token();	
     }else if(parser_accept(string)){
         DEBUG_OUTPUT("FACTOR -> STRING (%i) %s", lex_tk->size, lex_tk->raw_value);     
         leaf = ast_add_value_node(token_to_string(lex_tk),  NULL, NULL);           

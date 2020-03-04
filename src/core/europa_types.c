@@ -23,6 +23,16 @@ struct e_value *token_to_integer(struct lex_token *token){
     return v;    
 }
 
+
+struct e_value *token_to_neg_integer(struct lex_token *token){
+    struct e_value *v = factory_value();  
+    v->type = e_int; 
+    v->size = sizeof(int);
+    v->num = atoi(token->raw_value) * (-1);
+    return v;    
+}
+
+
 struct e_value *token_to_string(struct lex_token *token){
     struct e_value *v = factory_value();  
     v->type = e_string; 

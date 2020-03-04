@@ -71,6 +71,7 @@ struct e_reference {
 struct e_assignment *factory_assigment();
 struct e_value *factory_value();
 struct e_value *token_to_integer(struct lex_token *token);
+struct e_value *token_to_neg_integer(struct lex_token *token);
 struct e_value *token_to_string(struct lex_token *token);
 struct e_value *token_to_boolean(struct lex_token *token);
 struct e_reference *factory_reference();
