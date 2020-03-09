@@ -2,13 +2,6 @@
 #ifndef I_LEXER_H
 #define I_LEXER_H
 
-#include <stdio.h> // for 'FILE' and 'stdin' only.. ;/
-
-#define LEX_INPUT lex_input
-#define LEX_INPUT_DEFAULT stdin
-
-FILE *LEX_INPUT;
-
 // Max buffer size used when capturing
 #define LEX_CAP_BUFFER 1024
 
@@ -155,5 +148,7 @@ void lex_init();
 void lex_verbose(char *s, ...);
 
 char *lex_token_to_text(int tk_class);
+
+void lex_reset_state();
 
 #endif

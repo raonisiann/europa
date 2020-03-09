@@ -8,8 +8,10 @@
 #include "europa_std.h"
 #include "europa_debug.h"
 #include "europa_error.h"
+#include "europa.h"
 
 struct lex_token *lex_tk;
+extern struct eu_file_desc *eu_current_include_file;
 
 struct reserved_word lex_reserved_words[10][7] = {
     // Size 0 commands
@@ -130,16 +132,32 @@ void lex_next_token(){
     // so don't need to call lex_next_char one more time
     lex_ignore_white_spaces();  
     
-    // TODO: if end of file return LEX_EOF
-    // TODO: if start with //, comment   
-    if(feof(LEX_INPUT)){
-        lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");     
-    }else if(lex_cur_ch == '#'){
+    if(feof(CURRENT_FD)){
+		// check if the included file stack 
+		//size is 1... if true, the program will be 
+		// terminated, otherwise the file will be pop out 
+		// from the stack and this token will be ignored. 		
+		if(get_include_stack_size() == 1){
+			lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");    
+			return;
+		}else{
+			// pop out the included file from stack
+			pop_from_include_stack();
+			lex_tk = NULL;			
+			lex_cur_ch = '\0';
+			lex_prev_ch = '\0';  	
+			// request from previous file
+			lex_next_char();	
+			lex_ignore_white_spaces();  			
+		}        
+    }
+	
+	if(lex_cur_ch == '#'){
         while(lex_cur_ch != '\n'){
             lex_next_char();
         }		
-		lex_cur_line++;    
-        lex_cur_ch_pos = 0;		
+		CURRENT_LINE_NUM++;
+		CURRENT_CHAR_POS = 0;        	
     }else if(isdigit(lex_cur_ch)){
         // start digit/number capture         
         lex_tk = lex_cap_digit();
@@ -151,16 +169,16 @@ void lex_next_token(){
             case '\n':
                 // new line capture                 
                 lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
-                lex_cur_line++;    
-                lex_cur_ch_pos = 0;
+				CURRENT_LINE_NUM++;
+				CURRENT_CHAR_POS = 0;
                 break;
             case '\r':
                 lex_next_char();
                 if(lex_cur_ch == '\n'){
                     // new line capture                 
                     lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
-                    lex_cur_line++;
-                    lex_cur_ch_pos = 0;     
+					CURRENT_LINE_NUM++;
+					CURRENT_CHAR_POS = 0;    
                     break;                  
                 }else{
                     lex_error("Unable to handler non-newline after return. Expected '\\r\\n'.");
@@ -241,8 +259,7 @@ void lex_next_token(){
                     lex_unget_char();
                 }                
                 break;                                             
-            default: 
-				lex_next_char();
+            default: 				
                 lex_error("Unable to handle character");
         }        
     }       
@@ -395,8 +412,8 @@ struct lex_token *lex_create_tk(int class, unsigned int size, char *value){
     if(size > 0){
         tk->size = size;        
         tk->raw_value = _STRING_DUP(value);
-        tk->line_num = lex_cur_line;
-        tk->end_pos = lex_cur_ch_pos;
+        tk->line_num = CURRENT_LINE_NUM;
+        tk->end_pos = CURRENT_CHAR_POS;
     }else{
         tk->size = 0;
         tk->raw_value = NULL;   
@@ -416,24 +433,34 @@ void lex_ignore_white_spaces(){
 // Move forward the cursor to next available char
 void lex_next_char(){          
     lex_prev_ch = lex_cur_ch; 
-    lex_cur_ch = getc(LEX_INPUT);
-    lex_cur_ch_pos++;     
+    lex_cur_ch = getc(CURRENT_FD);
+    CURRENT_CHAR_POS++;     
 }
 
 // Move backward the cursor to previous stored char
 void lex_unget_char(){    
-    ungetc(lex_cur_ch, LEX_INPUT);
+    ungetc(lex_cur_ch, CURRENT_FD);
     lex_cur_ch = lex_prev_ch;    
-    lex_cur_ch_pos--;
+    CURRENT_CHAR_POS--;
 }
 
 // Lex error function... 
-void lex_error(const char *error){    
+void lex_error(const char *error){   
+	// save lex state
+	unsigned int ln = CURRENT_LINE_NUM;
+	unsigned int chpos = CURRENT_CHAR_POS;
+	char cur_char = lex_cur_ch;
+	// discard all remain line and reset char and line counters
+	while(lex_cur_ch != '\n'){
+		lex_cur_ch = getc(CURRENT_FD);
+	}
+	CURRENT_CHAR_POS = 1;
+	CURRENT_LINE_NUM = 1;
     EUROPA_ERROR("%s: Found '%c' at line %i, char %i", 
         error,
-        lex_cur_ch, 
-        lex_cur_line, 
-        lex_cur_ch_pos
+        cur_char, 
+        ln, 
+        chpos
     );                
 }
 
@@ -450,13 +477,17 @@ char *lex_token_to_text(int tk_class){
     return lex_token_text[tk_class];
 }
 
+// Reset lex settings to default values
+void lex_reset_state(){
+    lex_tk = NULL;    
+    lex_cur_ch = '\0';
+    lex_prev_ch = '\0';
+    CURRENT_CHAR_POS = 1;
+    CURRENT_LINE_NUM = 1;  	
+}
+
 // Initialize lexer settings
 void lex_init(){
 
-    lex_tk = NULL;
-    
-    lex_cur_ch = '\0';
-    lex_prev_ch = '\0';
-    lex_cur_ch_pos = 1;
-    lex_cur_line = 1;    
+	lex_reset_state();
 }
