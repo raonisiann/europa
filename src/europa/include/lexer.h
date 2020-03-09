@@ -60,7 +60,8 @@ typedef enum {
     fcall,
     parserexpr,
     returncmd, 
-    parserfactor    
+    parserfactor,
+	usecmd
 } lex_token_class;
 
 // Struct to store a lex token 

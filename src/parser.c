@@ -59,6 +59,23 @@ struct e_stmt *top_level(){
         // def FUNC_NAME '(' FUNC_ARGS ')' '{' FUNC_BODY '}'              
         func_def(); 
         return NULL;           
+	}else if(parser_accept(usecmd)){	
+		struct lex_token *include_file_tk = NULL; 	
+		// Include implementation
+		// use 'file_path'
+		lex_next_token();
+		parser_expect(string);		
+		include_file_tk = lex_tk;					
+		lex_next_token();
+		parser_expect(newline);				
+		// add file to stack 
+		push_to_include_stack(factory_file_desc(include_file_tk->raw_value));
+		// change lex attributes to get new tokens
+		// from the included file 		
+		lex_init();		
+		// next token will now get tokens
+		// from the opened file				
+		return NULL;
     }else{        
         lang = stmt();                                    
         return lang;
@@ -69,14 +86,14 @@ void eu_lang(){
     struct e_stmt *stmt = NULL; 
     while(1){        
         lex_next_token();        
+        // end of file reached... ending program..
+        if(parser_accept(eof) || lex_tk == NULL){            
+            break;
+        }		
         stmt = top_level();
         if(stmt != NULL){
             stmt_eval(stmt, GLOBAL_CTXT);
         } 
-        // end of file reached... ending program..
-        if(parser_accept(eof)){            
-            break;
-        }
     }
 }
 

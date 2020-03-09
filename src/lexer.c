@@ -33,6 +33,7 @@ struct reserved_word lex_reserved_words[10][7] = {
         {"def", defcmd},
         {"ret", returncmd},
         {"and", andoper},
+		{"use", usecmd},
         {NULL, undefined}
     },
     // Size 4 comamnds
@@ -67,7 +68,7 @@ struct reserved_word lex_reserved_words[10][7] = {
     }    
 };
 
-char lex_token_text[38][27] = {   
+char lex_token_text[39][27] = {   
 	"EOF", 
     "new line",
     "integer", 
@@ -105,7 +106,8 @@ char lex_token_text[38][27] = {
     "function call",
     "expression",
     "return",
-    "factor"    
+    "factor",
+	"use"
 };
 
 // Exactly match the "match"
