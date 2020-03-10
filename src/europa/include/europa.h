@@ -17,20 +17,26 @@
 #ifdef _WIN32
     // Windows (x86)
     #define EU_BUILT_OS "Windows"
+	#include "win_api.h"
 #elif _WIN64
     // Windows (x64)
     #define EU_BUILT_OS "Windows x64"
+	#include "win_api.h"
 #elif __unix__ 
     // Unix
     #define EU_BUILT_OS "Windows"
+	#include "linux_api.h"
 #elif __linux__
     // linux
     #define EU_BUILT_OS "Linux"
+	#include "linux_api.h"
 #elif __APPLE__
     // Mac OS, not sure if this is covered by __posix__ and/or __unix__ though...
     #define EU_BUILT_OS "Mac"
+	#include "linux_api.h"
 #else 
     #define EU_BUILT_OS "Unkown"
+	#include "linux_api.h"
 #endif
 
 // max depth allowed for include files
