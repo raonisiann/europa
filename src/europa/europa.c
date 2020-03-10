@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include "europa.h"
 #include "stack.h"
 #include "memm.h"
@@ -8,8 +9,29 @@ char europa_shell_mode = 0;
 e_stack *eu_include_stack = NULL;
 struct eu_file_desc *eu_current_include_file = NULL;
 
-void eu_init(){
+// Working dir will be used as base path
+// for include files as part of the include 
+// resolution process. 
+// This is mandatory and automatically defined 
+// during the lang startup process. 
+char *eu_working_dir = NULL; 
 
+// Root dir for include search.
+// Lowest priority for file include resolution. 
+// It's defined using env EUROPA_ROOT.
+// The path must be readable if defined. 
+// It's also not mandatory to have this define, but 
+// will affect the file include. 
+char *eu_root_dir = NULL; 
+
+void eu_init(){
+	
+	eu_working_dir = EU_GET_CWD(NULL, 0);
+	if(eu_working_dir == NULL){
+		EUROPA_ERROR("Unable to detect current directory. ");
+		exit(-1);
+	}	
+	
 	eu_include_stack = stack_init(EU_INCLUDE_MAX_DEPTH);
 }
 
