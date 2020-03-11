@@ -59,6 +59,14 @@ struct eu_file_desc *get_current_file_desc(){
 	return eu_current_include_file;
 }
 
+char *get_eu_working_dir(){
+	return eu_working_dir; 
+}
+
+char *get_eu_root_dir(){
+	return eu_root_dir; 
+}
+
 struct eu_file_desc *factory_file_desc(char *fname){
 	struct eu_file_desc *newfile = (struct eu_file_desc *)memm_alloc(sizeof(struct eu_file_desc));
 	newfile->line_num = 0; 

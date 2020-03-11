@@ -57,6 +57,8 @@ void push_to_include_stack(struct eu_file_desc *file);
 struct eu_file_desc *pop_from_include_stack();
 int get_include_stack_size();
 struct eu_file_desc *get_current_file_desc();
+char *get_eu_working_dir();
+char *get_eu_root_dir();
 struct eu_file_desc *factory_file_desc(char *fname);
 
 void eu_init();
