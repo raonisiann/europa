@@ -77,13 +77,13 @@ struct e_value *function_eval(struct ast_node *fcall_node, struct e_context *ctx
 		fcall_ctxt = context_create(15);				
 		if(fdef->type == e_fbuiltin){
 			input_list_res = param_eval(fcall_node, ctxt);
-			fdef->eu_func_entry_ptr(input_list_res, ctxt);
+			fdef->eu_func_entry_ptr(input_list_res, fcall_ctxt);
 		}else{
 			function_param_map(fdef, fcall_node, ctxt, fcall_ctxt);			
 			stmt_block_eval(fdef->funcdef->body, fcall_ctxt);				
 			DEBUG_OUTPUT("FUNC_EVAL_END");
 		}
-
+		
 		ret_value = fcall_ctxt->ret_val;
 		context_destroy(fcall_ctxt);
 		return ret_value; 
