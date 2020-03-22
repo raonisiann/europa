@@ -24,13 +24,11 @@ int main(int argc, char *argv[]){
     functions_init();           
 
 	if(argc > 1){
-		push_to_include_stack(factory_file_desc(argv[1]));    
-		lex_init();		
+		eu_switch_file_context(argv[1]);    
         eu_lang(); 
 	}else{  
         europa_shell_mode = 1;    
-		push_to_include_stack(factory_file_desc(EU_SHELL_FILE_NAME));
-		lex_init();		
+		eu_switch_file_context(EU_SHELL_FILE_NAME);
         // parse the language as shell mode  
         eu_shell();
     }  
