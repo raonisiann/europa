@@ -72,7 +72,6 @@ struct e_stmt *top_level(){
 		push_to_include_stack(factory_file_desc(include_file_tk->raw_value));
 		// change lex attributes to get new tokens
 		// from the included file 		
-		lex_init();		
 		// next token will now get tokens
 		// from the opened file				
 		return NULL;
