@@ -10,7 +10,8 @@
 #include "europa_error.h"
 #include "europa.h"
 
-struct lex_token *lex_tk;
+//struct lex_token *lex_tk;
+//struct lex_context *lex_cur_ctxt;
 extern struct eu_file_desc *eu_current_include_file;
 
 struct reserved_word lex_reserved_words[10][7] = {
@@ -488,8 +489,47 @@ void lex_reset_state(){
     CURRENT_LINE_NUM = 1;  	
 }
 
-// Initialize lexer settings
-void lex_init(){
 
-	lex_reset_state();
+struct lex_context *lex_create_context(){
+	struct lex_context *ctxt = (struct lex_context *)memm_alloc(sizeof(struct lex_context));
+	ctxt->lex_cur_ch = '\0';	
+	ctxt->lex_prev_ch = '\0';
+	ctxt->line_num = 1;
+	ctxt->char_pos = 1;
+	ctxt->tk_list = tk_create_list();
+	return ctxt;
 }
+
+struct tk_list *tk_create_list(){
+	struct tk_list *tk_list = (struct tk_list *)memm_alloc(sizeof(struct tk_list));
+	tk_list->size = 0;
+	tk_list->first = NULL;
+	tk_list->cur = NULL;
+	return tk_list;
+};
+
+struct tk_node *tk_create_node(){
+	struct tk_node *node = (struct tk_node *)memm_alloc(sizeof(struct tk_node));
+	node->next = NULL;
+	node->prev = NULL;
+	node->tk = NULL;
+	return node;
+};
+
+void tk_add_node(struct tk_list *list, struct lex_token *tk){
+    struct tk_node *new = tk_create_node(); 
+    new->tk = tk;             
+    if(list->first == NULL && list->last == NULL){        
+        list->first = new; 
+    }else{
+        list->last->next = new;
+    }
+
+        list->last = new;
+    list->size++; 
+}
+
+void lex_switch_context(struct lex_context *ctxt){
+	lex_cur_ctxt = ctxt;
+}
+
