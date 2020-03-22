@@ -16,7 +16,7 @@ extern struct lex_token *lex_tk;
 
 // 
 int parser_accept(int token){
-    if(TOKEN == token){          
+    if(TOKEN_CLASS == token){          
         DEBUG_OUTPUT("MATCHED TOKEN '%s'", lex_tk->raw_value);        
         return 1;
     }
@@ -211,14 +211,14 @@ void parser_ignore_new_lines(){
 
 struct list *stmt_block(){    
     struct list *stmt_list = list_create();
-    while(TOKEN == newline){        
+    while(TOKEN_CLASS == newline){        
         parser_expect(newline);
         lex_next_token();        
     }
     if(parser_accept(ocurlybrc)){       
         struct e_stmt *stmt_item = NULL;
         lex_next_token();           
-        while(TOKEN != ccurlybrc){
+        while(TOKEN_CLASS != ccurlybrc){
             stmt_item = stmt();   
             if(stmt_item){
                 list_add_item(stmt_list, (void *)stmt_item);
@@ -235,7 +235,7 @@ struct ast_node* expr(){
     struct ast_node* left = NULL;
 	struct lex_token *tk = NULL; 
     left = term();     
-    while(TOKEN == plus || TOKEN == minus || TOKEN == andoper || TOKEN == oroper){ 
+    while(TOKEN_CLASS == plus || TOKEN_CLASS == minus || TOKEN_CLASS == andoper || TOKEN_CLASS == oroper){ 
 		tk = lex_tk;
         lex_next_token();		
 		left = ast_add_token_node(tk, left, term());
@@ -249,7 +249,7 @@ struct ast_node* term(){
 	struct ast_node* parent = NULL;
 	struct lex_token *tk = NULL; 
     fct = factor();
-    while(TOKEN == multiply || TOKEN == division || TOKEN == equal || TOKEN == notequal || TOKEN == gt || TOKEN == gte || TOKEN == lt || TOKEN == lte){
+    while(TOKEN_CLASS == multiply || TOKEN_CLASS == division || TOKEN_CLASS == equal || TOKEN_CLASS == notequal || TOKEN_CLASS == gt || TOKEN_CLASS == gte || TOKEN_CLASS == lt || TOKEN_CLASS == lte){
 		tk = lex_tk;		
         lex_next_token();		
 		parent = ast_add_token_node(tk, fct, term());         
@@ -324,7 +324,7 @@ struct list *get_func_arg_symbols(){
             arg_item = ast_add_token_node(lex_tk, NULL, NULL);                              
             list_add_item(func_arg_list, (void *)arg_item);
             lex_next_token();           
-            if(TOKEN != comma){
+            if(TOKEN_CLASS != comma){
                 break;
             }     
             parser_expect(comma);    

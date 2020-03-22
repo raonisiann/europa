@@ -18,7 +18,8 @@
 #define LEX_SINGLE_QUOTE        '\''
 #define LEX_SCAPE_CHAR          '\\'
 
-#define TOKEN lex_tk->class
+#define TOKEN lex_cur_ctxt->tk_list->cur
+#define TOKEN_CLASS TOKEN->class
 #define CURRENT_LINE_NUM lex_cur_ctxt->line_num
 #define CURRENT_CHAR_POS lex_cur_ctxt->char_pos
 
