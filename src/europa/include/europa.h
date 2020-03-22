@@ -2,6 +2,7 @@
 #define I_EUROPA_H
 #include <stdio.h>
 #include "stack.h"
+#include "lexer.h"
 
 #define EU_VERSION "0.1"
 #define EU_BUILT_DATE __TIMESTAMP__
@@ -46,9 +47,8 @@
 
 
 struct eu_file_desc {
-	unsigned int line_num; 
-	unsigned int char_pos;
 	char *file_name; 
+	struct lex_context *lex_ctxt;
 	FILE *fd; 
 };
 
@@ -61,13 +61,12 @@ char *get_eu_working_dir();
 char *get_eu_root_dir();
 struct eu_file_desc *factory_file_desc(char *fname);
 
+void eu_switch_file_context(char *to_file);
 void eu_init();
 
 
 #define CURRENT_FILE_STRUCT get_current_file_desc()
 #define CURRENT_FILE_NAME CURRENT_FILE_STRUCT->file_name
-#define CURRENT_LINE_NUM CURRENT_FILE_STRUCT->line_num
-#define CURRENT_CHAR_POS CURRENT_FILE_STRUCT->char_pos
 #define CURRENT_FD CURRENT_FILE_STRUCT->fd
 
 #endif
