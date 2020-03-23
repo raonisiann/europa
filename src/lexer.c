@@ -145,6 +145,7 @@ void lex_next_token(){
 		// from the stack and this token will be ignored. 		
 		if(get_include_stack_size() == 1){
 			lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");    
+			tk_add_node(lex_cur_ctxt->tk_list, lex_tk);
 			return;
 		}else{
 			// pop out the included file from stack
