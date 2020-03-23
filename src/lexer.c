@@ -162,7 +162,7 @@ void lex_next_token(){
         while(LEX_CUR_CHAR != '\n'){
             lex_next_char();
         }		
-		CURRENT_LINE_NUM++;
+		LEX_LINE_NUM++;
 		CURRENT_CHAR_POS = 0;        	
     }else if(isdigit(LEX_CUR_CHAR)){
         // start digit/number capture         
@@ -175,7 +175,7 @@ void lex_next_token(){
             case '\n':
                 // new line capture                 
                 lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
-				CURRENT_LINE_NUM++;
+				LEX_LINE_NUM++;
 				CURRENT_CHAR_POS = 0;
                 break;
             case '\r':
@@ -183,7 +183,7 @@ void lex_next_token(){
                 if(LEX_CUR_CHAR == '\n'){
                     // new line capture                 
                     lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
-					CURRENT_LINE_NUM++;
+					LEX_LINE_NUM++;
 					CURRENT_CHAR_POS = 0;    
                     break;                  
                 }else{
@@ -421,7 +421,7 @@ struct lex_token *lex_create_tk(int class, unsigned int size, char *value){
     if(size > 0){
         tk->size = size;        
         tk->raw_value = _STRING_DUP(value);
-        tk->line_num = CURRENT_LINE_NUM;
+        tk->line_num = LEX_LINE_NUM;
         tk->end_pos = CURRENT_CHAR_POS;
     }else{
         tk->size = 0;
@@ -456,7 +456,7 @@ void lex_unget_char(){
 // Lex error function... 
 void lex_error(const char *error){   
 	// save lex state
-	unsigned int ln = CURRENT_LINE_NUM;
+	unsigned int ln = LEX_LINE_NUM;
 	unsigned int chpos = CURRENT_CHAR_POS;
 	char cur_char = LEX_CUR_CHAR;
 	// discard all remain line and reset char and line counters
@@ -464,7 +464,7 @@ void lex_error(const char *error){
 		LEX_CUR_CHAR = getc(CURRENT_FD);
 	}
 	CURRENT_CHAR_POS = 1;
-	CURRENT_LINE_NUM = 1;
+	LEX_LINE_NUM = 1;
     EUROPA_ERROR("%s: Found '%c' at line %i, char %i", 
         error,
         cur_char, 
@@ -491,7 +491,7 @@ void lex_reset_state(){
     LEX_CUR_CHAR = '\0';
     LEX_PREV_CHAR = '\0';
     CURRENT_CHAR_POS = 1;
-    CURRENT_LINE_NUM = 1;  	
+    LEX_LINE_NUM = 1;  	
 }
 
 
