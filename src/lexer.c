@@ -10,8 +10,6 @@
 #include "europa_error.h"
 #include "europa.h"
 
-//struct lex_token *lex_tk;
-//struct lex_context *lex_cur_ctxt;
 extern struct eu_file_desc *eu_current_include_file;
 
 struct reserved_word lex_reserved_words[10][7] = {
@@ -128,7 +126,12 @@ int lex_match_optional(const char match){
 
 
 void lex_next_token(){
+	struct lex_token *lex_tk = NULL;
     DEBUG_OUTPUT("NEXT TOKEN");
+	// check if the next on the list is null. 
+	// If not advance the cursor to the next.
+	// Otherwise start capturing a new token
+
     // grab the next available char   
     lex_next_char();
     // this will end up with a non-space char, 
@@ -266,6 +269,9 @@ void lex_next_token(){
                 lex_error("Unable to handle character");
         }        
     }       
+
+	// add token to the list 
+	tk_add_node(lex_cur_ctxt->tk_list, lex_tk);
 }
 
 // capture digits [0-9]
@@ -504,6 +510,7 @@ struct tk_list *tk_create_list(){
 	struct tk_list *tk_list = (struct tk_list *)memm_alloc(sizeof(struct tk_list));
 	tk_list->size = 0;
 	tk_list->first = NULL;
+	tk_list->last = NULL;
 	tk_list->cur = NULL;
 	return tk_list;
 };
@@ -519,13 +526,15 @@ struct tk_node *tk_create_node(){
 void tk_add_node(struct tk_list *list, struct lex_token *tk){
     struct tk_node *new = tk_create_node(); 
     new->tk = tk;             
-    if(list->first == NULL && list->last == NULL){        
+    if(list->first == NULL){        
         list->first = new; 
     }else{
         list->last->next = new;
     }
 
-        list->last = new;
+    list->last = new;
+	// adding a new token makes the new to be the current token 
+	list->cur = new; 
     list->size++; 
 }
 
