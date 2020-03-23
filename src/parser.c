@@ -12,12 +12,12 @@
 #include "europa_error.h"
 #include "europa.h"
 
-extern struct lex_token *lex_tk;
+extern struct lex_context *lex_cur_ctxt; 
 
 // 
 int parser_accept(int token){
     if(TOKEN_CLASS == token){          
-        DEBUG_OUTPUT("MATCHED TOKEN '%s'", lex_tk->raw_value);        
+        DEBUG_OUTPUT("MATCHED TOKEN '%s'", TOKEN->raw_value);        
         return 1;
     }
     return 0;
@@ -37,10 +37,10 @@ void parser_error(const char *error, int expected){
     EUROPA_ERROR(
         "Syntax Error: %s '%s' (%s) found at line %i, char %i. Expecting '%s' instead",
         error, 
-        lex_tk->raw_value, 
-        lex_token_to_text(lex_tk->class),
-        lex_tk->line_num,
-        lex_tk->end_pos - lex_tk->size,        
+        TOKEN->raw_value, 
+        lex_token_to_text(TOKEN->class),
+        TOKEN->line_num,
+        TOKEN->end_pos - TOKEN->size,        
         lex_token_to_text(expected)
     );
 }
@@ -65,7 +65,7 @@ struct e_stmt *top_level(){
 		// use 'file_path'
 		lex_next_token();
 		parser_expect(string);		
-		include_file_tk = lex_tk;					
+		include_file_tk = TOKEN;					
 		lex_next_token();
 		parser_expect(newline);				
 		// add file to stack 
@@ -86,7 +86,7 @@ void eu_lang(){
     while(1){        
         lex_next_token();        
         // end of file reached... ending program..
-        if(parser_accept(eof) || lex_tk == NULL){            
+        if(parser_accept(eof) || TOKEN == NULL){            
             break;
         }		
         stmt = top_level();
@@ -137,7 +137,7 @@ void func_def(){
     parser_expect(defcmd); 
     lex_next_token();
     parser_expect(reference);
-    ref_tk = lex_tk;    
+    ref_tk = TOKEN;    
     lex_next_token();    
     arg_list = get_func_arg_symbols();    
     lex_next_token();    
@@ -236,7 +236,7 @@ struct ast_node* expr(){
 	struct lex_token *tk = NULL; 
     left = term();     
     while(TOKEN_CLASS == plus || TOKEN_CLASS == minus || TOKEN_CLASS == andoper || TOKEN_CLASS == oroper){ 
-		tk = lex_tk;
+		tk = TOKEN;
         lex_next_token();		
 		left = ast_add_token_node(tk, left, term());
     }    
@@ -250,7 +250,7 @@ struct ast_node* term(){
 	struct lex_token *tk = NULL; 
     fct = factor();
     while(TOKEN_CLASS == multiply || TOKEN_CLASS == division || TOKEN_CLASS == equal || TOKEN_CLASS == notequal || TOKEN_CLASS == gt || TOKEN_CLASS == gte || TOKEN_CLASS == lt || TOKEN_CLASS == lte){
-		tk = lex_tk;		
+		tk = TOKEN;		
         lex_next_token();		
 		parent = ast_add_token_node(tk, fct, term());         
     }  
@@ -264,24 +264,24 @@ struct ast_node* term(){
 struct ast_node* factor(){ 
     struct ast_node* leaf = NULL;   
     if(parser_accept(integer)){
-        DEBUG_OUTPUT("FACTOR -> DIGIT (%i) %s", lex_tk->size, lex_tk->raw_value);                 
-        leaf = ast_add_value_node(token_to_integer(lex_tk),  NULL, NULL);
+        DEBUG_OUTPUT("FACTOR -> DIGIT (%i) %s", TOKEN->size, TOKEN->raw_value);                 
+        leaf = ast_add_value_node(token_to_integer(TOKEN),  NULL, NULL);
         lex_next_token();    
 	}else if(parser_accept(minus)){		
 		lex_next_token();
 		parser_expect(integer);
-		leaf = ast_add_value_node(token_to_neg_integer(lex_tk),  NULL, NULL);
+		leaf = ast_add_value_node(token_to_neg_integer(TOKEN),  NULL, NULL);
 		lex_next_token();	
     }else if(parser_accept(string)){
-        DEBUG_OUTPUT("FACTOR -> STRING (%i) %s", lex_tk->size, lex_tk->raw_value);     
-        leaf = ast_add_value_node(token_to_string(lex_tk),  NULL, NULL);           
+        DEBUG_OUTPUT("FACTOR -> STRING (%i) %s", TOKEN->size, TOKEN->raw_value);     
+        leaf = ast_add_value_node(token_to_string(TOKEN),  NULL, NULL);           
         lex_next_token();
     }else if(parser_accept(boolean)){
-        DEBUG_OUTPUT("FACTOR -> BOOLEAN (%i) %s", lex_tk->size, lex_tk->raw_value);               
-        leaf = ast_add_value_node(token_to_boolean(lex_tk),  NULL, NULL); 
+        DEBUG_OUTPUT("FACTOR -> BOOLEAN (%i) %s", TOKEN->size, TOKEN->raw_value);               
+        leaf = ast_add_value_node(token_to_boolean(TOKEN),  NULL, NULL); 
         lex_next_token();        
     }else if(parser_accept(reference)){            
-        struct lex_token *ref_tk = lex_tk;         
+        struct lex_token *ref_tk = TOKEN;         
         lex_next_token();      
         // if is an assigment return immediately to statement function
         if(parser_accept(assign)){              
@@ -321,7 +321,7 @@ struct list *get_func_arg_symbols(){
             parser_expect(reference);
             // TODO: 
             // no need for ast here... ?
-            arg_item = ast_add_token_node(lex_tk, NULL, NULL);                              
+            arg_item = ast_add_token_node(TOKEN, NULL, NULL);                              
             list_add_item(func_arg_list, (void *)arg_item);
             lex_next_token();           
             if(TOKEN_CLASS != comma){
@@ -349,7 +349,7 @@ struct list *expr_list(){
         do{                        
             li = expr();               
             list_add_item(l, (void *)li);
-            if(TOKEN != comma){                
+            if(TOKEN_CLASS != comma){                
                 break;
             }     
             parser_expect(comma);    
