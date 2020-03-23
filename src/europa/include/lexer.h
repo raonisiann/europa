@@ -22,8 +22,8 @@
 #define TOKEN_CLASS TOKEN->class
 #define LEX_CUR_CHAR lex_cur_ctxt->lex_cur_ch
 #define LEX_PREV_CHAR lex_cur_ctxt->lex_prev_ch
-#define CURRENT_LINE_NUM lex_cur_ctxt->line_num
-#define CURRENT_CHAR_POS lex_cur_ctxt->char_pos
+#define LEX_LINE_NUM lex_cur_ctxt->line_num
+#define LEX_CHAR_POS lex_cur_ctxt->char_pos
 
 typedef enum {
     undefined = -1,   

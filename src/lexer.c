@@ -163,7 +163,7 @@ void lex_next_token(){
             lex_next_char();
         }		
 		LEX_LINE_NUM++;
-		CURRENT_CHAR_POS = 0;        	
+		LEX_CHAR_POS = 0;        	
     }else if(isdigit(LEX_CUR_CHAR)){
         // start digit/number capture         
         lex_tk = lex_cap_digit();
@@ -176,7 +176,7 @@ void lex_next_token(){
                 // new line capture                 
                 lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
 				LEX_LINE_NUM++;
-				CURRENT_CHAR_POS = 0;
+				LEX_CHAR_POS = 0;
                 break;
             case '\r':
                 lex_next_char();
@@ -184,7 +184,7 @@ void lex_next_token(){
                     // new line capture                 
                     lex_tk = lex_create_tk(newline, 8, "NEW_LINE");   
 					LEX_LINE_NUM++;
-					CURRENT_CHAR_POS = 0;    
+					LEX_CHAR_POS = 0;    
                     break;                  
                 }else{
                     lex_error("Unable to handler non-newline after return. Expected '\\r\\n'.");
@@ -422,7 +422,7 @@ struct lex_token *lex_create_tk(int class, unsigned int size, char *value){
         tk->size = size;        
         tk->raw_value = _STRING_DUP(value);
         tk->line_num = LEX_LINE_NUM;
-        tk->end_pos = CURRENT_CHAR_POS;
+        tk->end_pos = LEX_CHAR_POS;
     }else{
         tk->size = 0;
         tk->raw_value = NULL;   
@@ -443,27 +443,27 @@ void lex_ignore_white_spaces(){
 void lex_next_char(){          
     LEX_PREV_CHAR = LEX_CUR_CHAR; 
     LEX_CUR_CHAR = getc(CURRENT_FD);
-    CURRENT_CHAR_POS++;     
+    LEX_CHAR_POS++;     
 }
 
 // Move backward the cursor to previous stored char
 void lex_unget_char(){    
     ungetc(LEX_CUR_CHAR, CURRENT_FD);
     LEX_CUR_CHAR = LEX_PREV_CHAR;    
-    CURRENT_CHAR_POS--;
+    LEX_CHAR_POS--;
 }
 
 // Lex error function... 
 void lex_error(const char *error){   
 	// save lex state
 	unsigned int ln = LEX_LINE_NUM;
-	unsigned int chpos = CURRENT_CHAR_POS;
+	unsigned int chpos = LEX_CHAR_POS;
 	char cur_char = LEX_CUR_CHAR;
 	// discard all remain line and reset char and line counters
 	while(LEX_CUR_CHAR != '\n'){
 		LEX_CUR_CHAR = getc(CURRENT_FD);
 	}
-	CURRENT_CHAR_POS = 1;
+	LEX_CHAR_POS = 1;
 	LEX_LINE_NUM = 1;
     EUROPA_ERROR("%s: Found '%c' at line %i, char %i", 
         error,
@@ -490,7 +490,7 @@ char *lex_token_to_text(int tk_class){
 void lex_reset_state(){
     LEX_CUR_CHAR = '\0';
     LEX_PREV_CHAR = '\0';
-    CURRENT_CHAR_POS = 1;
+    LEX_CHAR_POS = 1;
     LEX_LINE_NUM = 1;  	
 }
 
