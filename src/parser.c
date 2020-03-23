@@ -68,12 +68,9 @@ struct e_stmt *top_level(){
 		include_file_tk = TOKEN;					
 		lex_next_token();
 		parser_expect(newline);				
-		// add file to stack 
-		push_to_include_stack(factory_file_desc(include_file_tk->raw_value));
-		// change lex attributes to get new tokens
-		// from the included file 		
-		// next token will now get tokens
-		// from the opened file				
+		// add file to stack and switch lex context
+		eu_switch_file_context(include_file_tk->raw_value);
+		// From now, new tokens will be retrieved from the opened file				
 		return NULL;
     }else{        
         lang = stmt();                                    

@@ -56,6 +56,7 @@ struct eu_file_desc *pop_from_include_stack(){
 	// update the current include file with 
 	// the top of the stack 
 	eu_current_include_file = (struct eu_file_desc *)stack_peek(eu_include_stack);
+	lex_switch_context(ret->lex_ctxt);
 	return ret;
 }
 

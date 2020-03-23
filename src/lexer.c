@@ -146,17 +146,12 @@ void lex_next_token(){
 		if(get_include_stack_size() == 1){
 			lex_tk = lex_create_tk(eof, 11, "END_OF_FILE");    
 			tk_add_node(lex_cur_ctxt->tk_list, lex_tk);
-			return;
 		}else{
 			// pop out the included file from stack
 			pop_from_include_stack();
-			lex_tk = NULL;			
-			LEX_CUR_CHAR = '\0';
-			LEX_PREV_CHAR = '\0';  	
-			// request from previous file
-			lex_next_char();	
-			lex_ignore_white_spaces();  			
+			lex_next_token();
 		}        
+		return;
     }
 	
 	if(LEX_CUR_CHAR == '#'){
