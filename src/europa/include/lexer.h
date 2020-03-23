@@ -18,7 +18,7 @@
 #define LEX_SINGLE_QUOTE        '\''
 #define LEX_SCAPE_CHAR          '\\'
 
-#define TOKEN lex_cur_ctxt->tk_list->cur
+#define TOKEN lex_cur_ctxt->tk_list->cur->tk
 #define TOKEN_CLASS TOKEN->class
 #define CURRENT_LINE_NUM lex_cur_ctxt->line_num
 #define CURRENT_CHAR_POS lex_cur_ctxt->char_pos
@@ -104,23 +104,8 @@ struct reserved_word {
     lex_token_class token;
 };
 
-// store the current lex token 
-struct lex_token *lex_tk;
-
 // current lex context 
 struct lex_context *lex_cur_ctxt;
-
-// Current char for lexer. It's updated by
-// lex_next_char function
-char lex_cur_ch;
-
-char lex_prev_ch;
-
-// Current char position (or column)
-unsigned int lex_cur_ch_pos; 
-
-// Current line number
-unsigned int lex_cur_line;
 
 //
 // match functions
