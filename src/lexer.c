@@ -525,6 +525,7 @@ void tk_add_node(struct tk_list *list, struct lex_token *tk){
         list->first = new; 
     }else{
         list->last->next = new;
+		new->prev = list->last;
     }
 
     list->last = new;
