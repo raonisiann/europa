@@ -238,7 +238,7 @@ char *convert_to_string_value(struct e_value *v){
 			//return strndup(number_temp, strlen(number_temp));					    
             return _STRING_DUP(number_temp);
 		case e_string:			
-            return v->str;
+            return _STRING_DUP(v->str);
 		case e_boolean:	
             switch(v->boolean){
                 case e_true: 

@@ -126,6 +126,13 @@ int lex_match_optional(const char match){
 
 
 void lex_next_token(){
+	struct tk_list *list = NULL;
+	list = lex_cur_ctxt->tk_list;
+	if(list->cur != NULL && list->cur->next != NULL){
+		list->cur = list->cur->next;
+		return;
+	}
+
 	struct lex_token *lex_tk = NULL;
     DEBUG_OUTPUT("NEXT TOKEN");
 	// check if the next on the list is null. 
@@ -268,6 +275,16 @@ void lex_next_token(){
 
 	// add token to the list 
 	tk_add_node(lex_cur_ctxt->tk_list, lex_tk);
+}
+
+// Move the token cursor backward on the list 
+void lex_prev_token(){
+	struct tk_list *list = NULL;
+	list = lex_cur_ctxt->tk_list; 
+	if(list->cur == NULL || list->cur->prev == NULL){
+		return;
+	}	
+	list->cur = list->cur->prev;
 }
 
 // capture digits [0-9]

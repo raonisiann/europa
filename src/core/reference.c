@@ -29,7 +29,7 @@ struct e_value *reference_eval(struct ast_node *ref_node, struct e_context *ctxt
 void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node, struct e_context *cur_ctxt, struct e_context *new_ctxt){
 	struct list_item *input_arg = NULL, *def_arg = NULL;	
 	struct e_value *input_value = NULL;
-	
+	struct e_assignment *assign = NULL;
 	if(fdef->funcdef->arg_list->size != fcall_node->fcall->expr_list->size){
 		EUROPA_ERROR("Wrong number of parameters for function '%s', is expecting %i, but you provided %i\n", fcall_node->token->raw_value, fdef->funcdef->arg_list->size, fcall_node->fcall->expr_list->size);
 	}
@@ -38,8 +38,9 @@ void function_param_map(struct e_reference *fdef, struct ast_node *fcall_node, s
 	def_arg = fdef->funcdef->arg_list->first;
 	while(input_arg != NULL){		
 		DEBUG_OUTPUT("INPUT_ARG_EXPR_EVAL");
+		assign = ((struct e_stmt *)def_arg->data)->assign;
 		input_value = expr_eval((struct ast_node *)input_arg->data, cur_ctxt);
-		assignment_eval(((struct ast_node *)def_arg->data)->token, input_value, new_ctxt);
+		assignment_new_reference(assign->ref, input_value, new_ctxt);		
 		DEBUG_OUTPUT("NEXT_ITEM");
 		input_arg = input_arg->next;
 		def_arg = def_arg->next;
@@ -93,23 +94,29 @@ struct e_value *function_eval(struct ast_node *fcall_node, struct e_context *ctx
 	}
 }
 
-void assignment_eval(struct lex_token *ref_tk, struct e_value *v, struct e_context *ctxt){
-	// 
-	DEBUG_OUTPUT("ASSIGNMENT_EVAL -> '%s'", ref_tk->raw_value);	
+// Create a new reference 
+void assignment_new_reference(struct lex_token *tk_ref, struct e_value *value, struct e_context *ctxt){
+	DEBUG_OUTPUT("NEW_REFERENCE");
+	struct e_reference *new_ref = factory_reference();
+	new_ref->name = tk_ref->raw_value;
+	new_ref->type = e_reference;	
+	new_ref->value = value;		
+	set_ht_reference(new_ref, ctxt);
+}
+
+void assignment_eval(struct e_assignment *assign, struct e_context *ctxt){
+	struct e_value *expr_value = expr_eval(assign->ast, ctxt);      
+	DEBUG_OUTPUT("ASSIGNMENT_EVAL -> '%s'", assign->ref->raw_value);	
 	struct e_reference *found_ref = NULL; 
-	found_ref = get_ht_reference(ref_tk->raw_value, ctxt);
+	found_ref = get_ht_reference(assign->ref->raw_value, ctxt);
 	// new reference...
 	if(found_ref){	
 	// otherwise just a re-assign... 
 		DEBUG_OUTPUT("REASSIGN");
-		found_ref->value = v;
+		found_ref->value = expr_value;
 	}else{
 		DEBUG_OUTPUT("NEW_REFERENCE");
-		struct e_reference *new_ref = factory_reference();
-		new_ref->name = ref_tk->raw_value;
-		new_ref->type = e_reference;	
-		new_ref->value = v;		
-		set_ht_reference(new_ref, ctxt);
+		assignment_new_reference(assign->ref, expr_value, ctxt);
 	}	
 	DEBUG_OUTPUT("DONE_ASSIGMENT");
 }
@@ -157,9 +164,4 @@ struct e_reference *get_ht_reference(char *name, struct e_context *ctxt){
 		DEBUG_OUTPUT("REFERENCE_NOT_FOUND");
 		return NULL;
 	}
-}
-
-// assign a value to reference 
-void set_value_to_reference(struct e_reference *ref, struct e_value *v){	
-	ref->value = v; 
 }

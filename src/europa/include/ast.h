@@ -52,7 +52,6 @@ struct ast_node *ast_factory_node();
 struct ast_node_fcall *ast_factory_fcall_node();
 struct ast_node_assign *ast_factory_assign_node();
 struct ast_assignment_node *ast_factory_assignment_node();
-struct ast_assignment_node *ast_create_assignment(struct ast_node *ref, struct ast_node *assign);
 void ast_free(struct ast_node *node);
 
 

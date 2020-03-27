@@ -27,10 +27,12 @@ struct e_stmt *stmt_create_flow(unsigned int type, struct e_flow *flow){
     return newstmt;
 }
 
-struct e_stmt *stmt_create_assign(struct ast_node *n){
+struct e_stmt *stmt_create_assign(struct lex_token *ref, struct ast_node *expr){
     struct e_stmt *newstmt = stmt_factory();
     newstmt->type = s_assign;
-    newstmt->expr = n; 
+    newstmt->assign = factory_assigment(); 
+    newstmt->assign->ref = ref;
+    newstmt->assign->ast = expr;
     return newstmt;
 }
 
@@ -54,9 +56,8 @@ void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt){
     switch(stmt->type){
         case s_assign: 
             // Assignment eval			 
-            DEBUG_OUTPUT("ASSIGNMENT_EVAL\n");
-            expr_value = expr_eval(stmt->expr->assign->expr, ctxt);
-            assignment_eval(stmt->expr->assign->reference, expr_value, ctxt);
+            DEBUG_OUTPUT("ASSIGNMENT_EVAL\n");            
+            assignment_eval(stmt->assign, ctxt);
             break;
         case s_expr: 
             // Expression statement            	

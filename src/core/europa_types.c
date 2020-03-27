@@ -73,13 +73,6 @@ struct e_reference *new_fdef(struct lex_token *ref_tk, struct list *args, struct
     return func_def;
 }
 
-struct e_assignment *create_assignment(struct e_reference *ref, struct ast_node *n){
-	struct e_assignment *assignment = factory_assigment();
-	assignment->ref = ref; 
-	assignment->ast = n;
-    return assignment;
-}
-
 struct e_reference *factory_reference(){
     struct e_reference *new_ref = (struct e_reference *)memm_alloc(sizeof(struct e_reference));
     new_ref->type = e_undefined;

@@ -133,6 +133,7 @@ int lex_match_alpha();
 
 
 void lex_next_token();
+void lex_prev_token();
 //
 // capture functions
 //

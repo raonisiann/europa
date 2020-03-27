@@ -179,7 +179,21 @@ struct e_stmt *stmt(){
         lex_next_token();
         return stmt_create_return(expr());
     }else{
-    // EXPR, ASSINGMENT        
+    // EXPR, ASSINGMENT   
+        struct lex_token *tk_ref = NULL; 
+        if(parser_accept(reference)){
+            tk_ref = TOKEN;            
+            lex_next_token();
+            if(parser_accept(assign)){                
+                lex_next_token();
+                return stmt_create_assign(tk_ref, expr());               
+            }else{
+                // return token pointer to previous one.
+                lex_prev_token();
+                return stmt_create_expr(expr());
+            }
+        }  
+        /*   
         struct ast_node* _expr = NULL;
         _expr = expr();         
         if(parser_accept(assign)){                                   
@@ -192,7 +206,8 @@ struct e_stmt *stmt(){
             return stmt_create_assign(_expr);
         }else{
             return stmt_create_expr(_expr);
-        }     
+        } 
+        */    
     }      
 }
 
@@ -313,12 +328,10 @@ struct list *get_func_arg_symbols(){
     if(parser_accept(cparenteses)){
         DEBUG_OUTPUT("No references captured captured");                      
     }else{       
-        struct ast_node *arg_item = NULL;        
+        struct e_stmt *arg_item = NULL;        
         do{                    
-            parser_expect(reference);
-            // TODO: 
-            // no need for ast here... ?
-            arg_item = ast_add_token_node(TOKEN, NULL, NULL);                              
+            parser_expect(reference); 
+            arg_item = stmt_create_assign(TOKEN, NULL);                          
             list_add_item(func_arg_list, (void *)arg_item);
             lex_next_token();           
             if(TOKEN_CLASS != comma){

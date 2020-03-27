@@ -45,7 +45,7 @@ struct e_fcall {
 };
 
 struct e_assignment {
-    struct e_reference *ref; 
+    struct lex_token *ref; 
     struct ast_node *ast;
 };
 

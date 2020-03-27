@@ -31,7 +31,7 @@ void stmt_eval(struct e_stmt *stmt, struct e_context *ctxt);
 void stmt_block_eval(struct list *stmt_list, struct e_context *ctxt);
 struct e_stmt *stmt_create_expr(struct ast_node *n);
 struct e_stmt *stmt_create_flow(unsigned int type, struct e_flow *flow);
-struct e_stmt *stmt_create_assign(struct ast_node *n);
+struct e_stmt *stmt_create_assign(struct lex_token *ref, struct ast_node *expr);
 struct e_stmt *stmt_create_func_def(struct e_reference *func_def);
 struct e_stmt *stmt_create_return(struct ast_node *n);
 
