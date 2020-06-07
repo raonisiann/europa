@@ -58,3 +58,6 @@ _test
 .gdb_history
 peda-session-europa.txt
 debug.txt
+
+# Others
+.vscode

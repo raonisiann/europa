@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "list.h"
 #include "context.h"
+#include "europa/object.h"
 
 typedef enum {
     e_false = 0,
@@ -14,54 +15,56 @@ typedef enum {
 } e_bool;
 
 typedef enum {
-    e_undefined, 
+    e_undefined,
     e_int,
-    e_string, 
-    e_boolean, 
+    e_string,
+    e_boolean,
     e_reference,
     e_fcall,
     e_fdef,
-    e_fbuiltin
-} e_type; 
+    e_fbuiltin,
+    e_object
+} e_type;
 
 struct e_array {
     struct list *items;
 };
 
 struct e_value {
-    char type;     
-    unsigned int size;     
+    char type;
+    unsigned int size;
     union {
-        unsigned int boolean;  
-        int num;                    
-        char *str;                    
-        struct e_array *arr;    
+        EuObject *object;
+        unsigned int boolean;
+        int num;
+        char *str;
+        struct e_array *arr;
     };
 };
 
-struct e_fcall {    
+struct e_fcall {
     struct list *args;
     struct e_value *ret;
 };
 
 struct e_assignment {
-    struct lex_token *ref; 
+    struct lex_token *ref;
     struct ast_node *ast;
 };
 
 struct e_func_def {
-    struct list *arg_list; // list of... 
-    struct list *body; // list of e_stmt 
-    struct e_context *ctxt; 
+    struct list *arg_list;
+    struct list *body;
+    struct e_context *ctxt;
 };
 
 struct e_reference {
     char type;
-    char *name;   
+    char *name;
     union {
-        struct e_value *value;       
+        struct e_value *value;
         struct e_fcall *fcall;
-        struct e_func_def *funcdef; 
+        struct e_func_def *funcdef;
         struct eu_func_builtin *bfunc;
         void (*eu_func_entry_ptr) (struct list *, struct e_context *);
     };
@@ -74,6 +77,7 @@ struct e_value *token_to_integer(struct lex_token *token);
 struct e_value *token_to_neg_integer(struct lex_token *token);
 struct e_value *token_to_string(struct lex_token *token);
 struct e_value *token_to_boolean(struct lex_token *token);
+struct e_value *token_to_object(EuObject *object);
 struct e_reference *factory_reference();
 struct e_reference *new_reference(char *ref_name, struct e_value *val);
 struct e_reference *new_fcall(struct e_reference *ref, struct list *args);

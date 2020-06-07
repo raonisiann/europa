@@ -19,7 +19,7 @@ struct list *list_create(){
     newlist->size = 0;
     newlist->first = NULL;
     newlist->last = NULL;
-    return newlist;    
+    return newlist;
 }
 
 // Duplicate the list struct returning a pointer 

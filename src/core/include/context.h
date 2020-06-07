@@ -3,14 +3,15 @@
 
 #include "hashtable.h"
 #include "europa_types.h"
+#include "europa/object.h"
 
 // Will provide context functions and branchs
 // Also provides an way to exchange information 
 // between different context with "ret_val"
 struct e_context {
-    hashtable *symbols;   
-	struct e_value *ret_val;	
-	unsigned int sig_ret;
+    hashtable *symbols;
+    EuObject *ret_val;
+    unsigned int sig_ret;
 };
 
 struct e_context *context_create(unsigned int sym_init_size);

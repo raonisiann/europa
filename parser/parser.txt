@@ -1,0 +1,21 @@
+// this is proposal grammar for Europa language
+// Nothing here makes any changes to the current language grammar
+// it's just a model abstracted from the C code for 
+// better understanding.
+//
+// CHANGES HERE WON'T REFLECT IN THE LANGUAGE
+//
+
+top_level -> newline | eof | def | use | stmt
+def -> 'def' identifier '(' identifier_list ')'
+use -> 'use' file_path
+stmt -> newline | while | return | if | expr | assign
+while -> 'while' expr '{' stmt_block '}'
+return -> 'return' expr
+assign -> reference '=' expr
+if -> 'if' expr '{' stmt_block '}'
+expr -> term | expr 
+term -> factor | term
+factor -> reference | integer | boolean | string | '(' expr ')'
+stmt_block -> newline | stmt newline | stmt_block
+identifier_list -> 

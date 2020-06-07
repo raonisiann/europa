@@ -14,5 +14,5 @@ debug_enabled:
 	$(CCOMPILER) -o $(EXEC_FILE_NAME) $(INCLUDE_DIR) $(DEBUG_GCC_FLAGS) $(INCLUDE_FILES) $(LINKER_FLAGS)
 	
 clean: 
-	rm -f $(EXEC_FILE_NAME) *.obj	
-	
+	rm -f $(BIN_DIR)/*
+	rm -f *.obj

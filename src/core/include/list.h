@@ -1,17 +1,17 @@
 #ifndef I_LIST_H
 #define I_LIST_H
 
-// Linked List 
+// Linked List
 struct list {
     int size;
-    struct list_item *first;        
-    struct list_item *last; 
+    struct list_item *first;
+    struct list_item *last;
 };
 
-// Linked list item  
+// Linked list item
 struct list_item {
     struct list_item *next;
-    void *data;     
+    void *data;
 };
 
 struct list *list_factory();
